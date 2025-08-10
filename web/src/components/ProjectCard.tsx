@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { track } from "@vercel/analytics/react";
 
 type Project = {
@@ -32,7 +33,7 @@ export function ProjectCard({ p }: { p: Project }) {
           <p className="text-sm opacity-80 line-clamp-3 mt-1">{p.pitch}</p>
           <div className="mt-2 text-xs opacity-60">{p.category} • {p.status}</div>
         </div>
-        <button onClick={interest} className="btn-primary">I'm interested</button>
+        <Button onClick={interest}>I'm interested</Button>
       </div>
     </div>
   );

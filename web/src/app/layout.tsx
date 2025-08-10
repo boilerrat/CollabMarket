@@ -34,7 +34,7 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-black/40">
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
-            <Link href="/" className="text-base font-semibold tracking-tight">Collab</Link>
+            <Link href="/" className="text-base font-semibold tracking-tight text-gradient">Collab</Link>
             <Link href="/feed" className="opacity-80 hover:opacity-100 transition">Feed</Link>
             <Link href="/projects" className="opacity-80 hover:opacity-100 transition">Projects</Link>
             <Link href="/projects/new" className="opacity-80 hover:opacity-100 transition">New</Link>

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Ensure Tailwind v4 scans our TS/TSX sources */
+@source "../**/*.{ts,tsx,js,jsx,mdx}";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/line-clamp";
@@ -86,4 +88,21 @@ body {
 
 .btn-outline {
   @apply inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium hover:bg-black/[.04] dark:hover:bg-white/[.06] focus:outline-none;
+}
+
+/* Fun but subtle gradient text utility */
+.text-gradient {
+  background-image: linear-gradient(90deg, #6d28d9, #2563eb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Tiny chips/badges */
+.chip {
+  @apply inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg-white/10 px-2 py-0.5 text-[11px] leading-5 whitespace-nowrap;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-md bg-black/5 dark:bg-white/10 px-2 py-1 text-xs;
 }

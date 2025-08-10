@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 "use client";
 import { useEffect, useState } from "react";
 
@@ -51,8 +52,8 @@ export default function InboxPage() {
                 <div className="text-xs mt-1 opacity-60">Status: {i.status}</div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="btn-primary" onClick={() => act(i.id, "accept")} disabled={i.status !== "pending"}>Accept</button>
-                <button className="btn-outline" onClick={() => act(i.id, "dismiss")} disabled={i.status !== "pending"}>Dismiss</button>
+                <Button onClick={() => act(i.id, "accept")} disabled={i.status !== "pending"}>Accept</Button>
+                <Button intent="outline" onClick={() => act(i.id, "dismiss")} disabled={i.status !== "pending"}>Dismiss</Button>
               </div>
             </div>
           </li>

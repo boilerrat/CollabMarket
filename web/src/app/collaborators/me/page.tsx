@@ -1,3 +1,6 @@
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 "use client";
 import { useState } from "react";
 import { track } from "@vercel/analytics/react";
@@ -34,16 +37,16 @@ export default function MyProfilePage() {
     <div className="max-w-2xl mx-auto p-4 md:p-6">
       <h1 className="text-2xl font-semibold tracking-tight mb-4">My Collaborator Profile</h1>
       <form onSubmit={onSubmit} className="space-y-3 surface p-4" aria-label="Collaborator profile form">
-        <input aria-label="Skills" className="w-full bg-transparent border rounded p-2" placeholder="Skills (comma-separated)" value={skills} onChange={(e) => setSkills(e.target.value)} />
-        <textarea aria-label="Bio" className="w-full bg-transparent border rounded p-2" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
-        <input aria-label="Availability hours per week" type="number" className="w-full bg-transparent border rounded p-2" placeholder="Availability hours/week" value={availability} onChange={(e) => setAvailability(Number(e.target.value))} />
+        <Input aria-label="Skills" placeholder="Skills (comma-separated)" value={skills} onChange={(e) => setSkills(e.target.value)} />
+        <Textarea aria-label="Bio" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+        <Input aria-label="Availability hours per week" type="number" placeholder="Availability hours/week" value={availability} onChange={(e) => setAvailability(Number(e.target.value))} />
         <label className="block text-sm">Visibility
           <select aria-label="Visibility" className="w-full bg-transparent border rounded p-2" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
             <option value="public">Public</option>
             <option value="private">Private</option>
           </select>
         </label>
-        <button type="submit" className="btn-primary">Save</button>
+        <Button type="submit">Save</Button>
       </form>
       {message && <p className="mt-3 text-sm" role="status">{message}</p>}
     </div>

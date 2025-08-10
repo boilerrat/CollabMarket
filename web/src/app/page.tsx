@@ -10,7 +10,7 @@ export default function Home() {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-              Find collaborators. Ship faster.
+              <span className="text-gradient">Find collaborators.</span> Ship faster.
             </h1>
             <p className="mt-4 text-base opacity-80 max-w-prose">
               Post a project, discover talent, and send interest with one tap. Built for Farcaster Mini Apps.
@@ -19,10 +19,10 @@ export default function Home() {
               <AuthButtons />
               <a href="/feed" className="btn-outline">Browse feed</a>
             </div>
-            <div className="mt-8 grid grid-cols-3 gap-3 text-xs opacity-70">
-              <div className="surface p-3">Secure by default</div>
-              <div className="surface p-3">Fast mini app UX</div>
-              <div className="surface p-3">Daily digest</div>
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs opacity-90">
+              <div className="surface p-3 flex items-center gap-2"><span className="chip">P0</span> Secure by default</div>
+              <div className="surface p-3 flex items-center gap-2"><span className="chip">⚡</span> Fast mini app UX</div>
+              <div className="surface p-3 flex items-center gap-2"><span className="chip">☀︎</span> Daily digest</div>
             </div>
           </div>
           <div className="surface p-6 md:p-8">
