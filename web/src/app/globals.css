@@ -7,17 +7,22 @@
 
 /* Design tokens */
 :root {
-  --background: #0b0b0b;
-  --foreground: #111111;
-  --text: #0f172a; /* slate-900 */
-  --text-inverted: #f8fafc; /* slate-50 */
-  --primary: #6d28d9; /* violet-700 */
+  /* Brand palette */
+  --brand-primary: #00686e; /* teal */
+  --brand-deep: #002629;   /* deep teal */
+  --brand-accent: #55dcdf; /* aqua */
+
+  --background: var(--brand-deep);
+  --foreground: #0e1011;
+  --text: #0e1011;
+  --text-inverted: #ffffff;
+  --primary: var(--brand-primary);
   --primary-foreground: #ffffff;
-  --accent: #22c55e; /* green-500 */
-  --accent-2: #0ea5e9; /* sky-500 */
+  --accent: var(--brand-accent);
+  --accent-2: #0ea5e9;
   --card: #ffffff;
   --card-dark: #0a0a0a;
-  --ring: #c084fc; /* violet-300 */
+  --ring: #8eeff1; /* light aqua for focus ring */
 }
 
 @theme inline {
@@ -29,11 +34,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #050505;
-    --foreground: #101010;
-    --text: #e5e7eb; /* gray-200 */
+    --background: var(--brand-deep);
+    --foreground: #0a0a0a;
+    --text: #e6f6f7;
     --text-inverted: #0b0b0b;
-    --card: #0d0d0d;
+    --card: #0d1718;
   }
 }
 
@@ -45,21 +50,16 @@ html, body {
 body {
   color: var(--text);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  /* Subtle gradient + grid for a modern depth */
+  /* Background image with brand tints overlayed for readability */
   background-image:
-    radial-gradient(70rem 40rem at 10% -10%, rgba(109, 40, 217, 0.28), transparent 60%),
-    radial-gradient(60rem 30rem at 110% 10%, rgba(14, 165, 233, 0.24), transparent 60%),
-    radial-gradient(30rem 30rem at -10% 110%, rgba(34,197,94,0.18), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
-    repeating-linear-gradient(
-      0deg,
-      rgba(0,0,0,0.03),
-      rgba(0,0,0,0.03) 1px,
-      transparent 1px,
-      transparent 28px
-    );
-  background-color: #fbfbfb;
-  background-blend-mode: normal, normal, color, normal;
+    linear-gradient(180deg, rgba(0,38,41,0.60), rgba(0,38,41,0.45)),
+    radial-gradient(60rem 30rem at 110% 10%, rgba(85,220,223,0.25), transparent 60%),
+    radial-gradient(40rem 30rem at -10% 110%, rgba(0,104,110,0.20), transparent 40%),
+    url('/bg.png');
+  background-color: var(--brand-deep);
+  background-size: cover, 100% 100%, 100% 100%, cover;
+  background-position: center, center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
 
 /* Reset anchor defaults so button-as-link styles render correctly */
@@ -87,7 +87,7 @@ a {
 
 /* Utility: a soft card surface */
 .surface {
-  @apply rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-neutral-900/60 backdrop-blur shadow-sm;
+  @apply rounded-2xl border border-black/5 dark:border-white/10 bg-white/75 dark:bg-black/40 backdrop-blur-md shadow-sm;
 }
 
 /* Utility: primary button styling shortcut for places we don't use a component yet */
@@ -101,7 +101,7 @@ a {
 
 /* Fun but subtle gradient text utility */
 .text-gradient {
-  background-image: linear-gradient(90deg, #6d28d9, #0ea5e9, #22c55e);
+  background-image: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

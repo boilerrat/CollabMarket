@@ -13,8 +13,8 @@
   padding: 8px 12px;
   font-size: 14px;
   line-height: 1;
-  border: 1px solid rgba(0,0,0,.12);
-  background: rgba(255,255,255,.8);
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.75);
   color: inherit;
   text-decoration: none;
   transition: background-color .15s ease, box-shadow .15s ease, opacity .15s ease;
@@ -22,15 +22,15 @@
 
 @media (prefers-color-scheme: dark) {
   .btn {
-    border-color: rgba(255,255,255,.16);
-    background: rgba(20,20,20,.6);
+    border-color: rgba(255,255,255,.25);
+    background: rgba(10,20,22,.55);
   }
 }
 
 .btn:hover { filter: brightness(1.05); }
 
 .btnActive {
-  background: linear-gradient(180deg, rgba(109,40,217,.95), rgba(14,165,233,.95));
+  background: linear-gradient(180deg, #00686e, #55dcdf);
   color: #fff;
   border-color: transparent;
 }

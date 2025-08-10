@@ -33,7 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(109,40,217,.08), rgba(14,165,233,.08))" }}>
+        <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))" }}>
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
             <Link href="/" className="text-base font-semibold tracking-tight text-gradient no-underline">Collab</Link>
             <div className="ml-auto">
