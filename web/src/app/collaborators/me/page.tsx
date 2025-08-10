@@ -1,7 +1,7 @@
+"use client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-"use client";
 import { useState } from "react";
 import { track } from "@vercel/analytics/react";
 
