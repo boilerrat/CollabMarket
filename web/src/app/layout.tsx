@@ -34,7 +34,7 @@ export default async function RootLayout({
   // This is safe and lightweight; header values are exposed for clients if needed
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} style={{ color: "#ffffff" }}>
         <Background />
         <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))" }}>
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
@@ -44,8 +44,8 @@ export default async function RootLayout({
             </div>
           </nav>
         </header>
-        <main className="min-h-[calc(100dvh-56px)] w-full flex justify-center">
-          <div className="w-full max-w-[720px] md:max-w-[960px] px-4 md:px-8 py-6 md:py-10">
+        <main className="min-h-[calc(100dvh-56px)] w-full grid place-items-start">
+          <div className="w-full max-w-screen-md md:max-w-screen-lg lg:max-w-screen-xl mx-4 md:mx-6 my-6 md:my-8 rounded-2xl bg-white/80 dark:bg-black/40 shadow-xl border border-white/20 text-black px-5 md:px-8 py-6 md:py-10">
             {children}
           </div>
         </main>

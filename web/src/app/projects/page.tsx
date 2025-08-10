@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getBaseUrl } from "@/lib/url";
 
 async function fetchProjects() {
-  const base = getBaseUrl();
+  const base = await getBaseUrl();
   const res = await fetch(new URL("/api/projects", base).toString(), { cache: "no-store" });
   if (!res.ok) return { items: [] };
   return res.json();
