@@ -9,7 +9,11 @@
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "e2e:auth": "node ./scripts/auth-e2e.mjs",
+    "seed": "node ./scripts/seed.mjs",
+    "db:indexes": "node ./scripts/create-indexes.mjs",
+    "digest": "node ./scripts/digest.mjs"
   },
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.1.8",
@@ -18,6 +22,8 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.16",
     "@vercel/analytics": "^1.5.0",
+    "@prisma/client": "^6.13.0",
+    "jose": "^5.9.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "next": "15.4.6",
@@ -29,7 +35,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@prisma/client": "^6.13.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.10",
     "@types/react": "^19",

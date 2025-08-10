@@ -10,6 +10,8 @@ export function AppInit(): null {
       try {
         // Lightweight hydrate: ping health before signaling ready
         await fetch("/api/health", { cache: "no-store" });
+        // Prime CSRF token for subsequent writes
+        await fetch("/api/auth/csrf", { cache: "no-store" });
       } catch {
         // ignore; readiness should still be signaled
       } finally {

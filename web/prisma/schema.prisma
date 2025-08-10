@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -22,6 +21,7 @@ model users {
   avatar_url      String?  @map("avatar_url")
   email           String?  @unique @map("email")
   public_links    Json?    @map("public_links")
+  shadow_banned   Boolean  @default(false) @map("shadow_banned")
   is_deleted      Boolean  @default(false) @map("is_deleted")
   created_at      DateTime @default(now()) @map("created_at")
   updated_at      DateTime @updatedAt @map("updated_at")

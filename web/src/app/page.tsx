@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { AppInit } from "@/components/AppInit";
+import { AuthButtons } from "@/components/AuthButtons";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
           height={38}
           priority
         />
+        <AuthButtons />
         <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}

@@ -22,6 +22,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch CSRF on initial layout render to prime cookie in SSR
+  // This is safe and lightweight; header values are exposed for clients if needed
   return (
     <html lang="en">
       <body
