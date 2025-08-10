@@ -6,13 +6,13 @@ export default function Home() {
   return (
     <div className="relative min-h-[calc(100dvh-56px)]">
       <AppInit />
-      <section className="max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-28">
+      <section className="panel mx-auto py-10 md:py-16">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
               <span className="text-gradient">Find collaborators.</span> Ship faster.
             </h1>
-            <p className="mt-4 text-base opacity-80 max-w-prose">
+            <p className="mt-4 text-[17px] leading-7 opacity-90 max-w-prose">
               Post a project, discover talent, and send interest with one tap. Built for Farcaster Mini Apps.
             </p>
             <div className="mt-6 flex gap-3">

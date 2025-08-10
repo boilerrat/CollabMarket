@@ -5,6 +5,8 @@ import Link from "next/link";
 import { NavLinks } from "@/components/NavLinks";
 import { getSession } from "@/lib/session";
 import { isAdminByFid } from "@/lib/admin";
+import { Background } from "@/components/Background";
+import { TabBar } from "@/components/TabBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +35,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Background />
         <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))" }}>
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
             <Link href="/" className="text-base font-semibold tracking-tight text-gradient no-underline">Collab</Link>
@@ -41,7 +44,14 @@ export default async function RootLayout({
             </div>
           </nav>
         </header>
-        <main className="min-h-[calc(100dvh-56px)]">{children}</main>
+        <main className="min-h-[calc(100dvh-56px)] w-full flex justify-center">
+          <div className="w-full max-w-[720px] md:max-w-[960px] px-4 md:px-8 py-6 md:py-10">
+            {children}
+          </div>
+        </main>
+        <div className="mx-auto w-full max-w-[960px]">
+          <TabBar />
+        </div>
         <footer className="border-t mt-12">
           <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 text-xs opacity-70">
             Built for Farcaster Mini Apps · MVP

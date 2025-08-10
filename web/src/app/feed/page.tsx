@@ -34,7 +34,7 @@ export default function FeedPage() {
   useEffect(() => { load(); /* initial */ }, [tab]);
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-4">
+    <div className="panel space-y-4 text-[17px] leading-7">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Discover</h1>
         <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>

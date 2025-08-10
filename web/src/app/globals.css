@@ -13,8 +13,8 @@
   --brand-accent: #55dcdf; /* aqua */
 
   --background: var(--brand-deep);
-  --foreground: #0e1011;
-  --text: #0e1011;
+  --foreground: #e6f6f7;
+  --text: #e6f6f7;
   --text-inverted: #ffffff;
   --primary: var(--brand-primary);
   --primary-foreground: #ffffff;
@@ -50,6 +50,8 @@ html, body {
 body {
   color: var(--text);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 16px;
+  line-height: 1.6;
   /* Background image with brand tints overlayed for readability */
   background-image:
     linear-gradient(180deg, rgba(0,38,41,0.60), rgba(0,38,41,0.45)),
@@ -88,6 +90,57 @@ a {
 /* Utility: a soft card surface */
 .surface {
   @apply rounded-2xl border border-black/5 dark:border-white/10 bg-white/75 dark:bg-black/40 backdrop-blur-md shadow-sm;
+  color: #0f172a;
+}
+
+/* Elevated app panel to improve readability over the background */
+.panel {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  .panel {
+    background: rgba(10, 20, 22, 0.6);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+/* Bottom tab bar for Mini App feel */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 10px 16px calc(env(safe-area-inset-bottom) + 10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(0, 38, 41, 0.45), rgba(0, 38, 41, 0.65));
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.tabbar a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #e6f6f7;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+}
+.tabbar a.active {
+  background: linear-gradient(180deg, #00686e, #55dcdf);
+  color: #001416;
+  border-color: transparent;
 }
 
 /* Utility: primary button styling shortcut for places we don't use a component yet */
