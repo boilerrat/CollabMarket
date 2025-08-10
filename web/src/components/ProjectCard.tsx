@@ -25,14 +25,14 @@ export function ProjectCard({ p }: { p: Project }) {
   }
 
   return (
-    <div className="border rounded p-3 hover:shadow-sm transition">
-      <div className="flex items-start justify-between gap-3">
+    <div className="surface p-4 hover:shadow-sm transition-shadow">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-medium">{p.title}</h3>
-          <p className="text-sm text-gray-600 line-clamp-3">{p.pitch}</p>
-          <div className="mt-2 text-xs text-gray-500">{p.category} • {p.status}</div>
+          <h3 className="font-medium text-[15px]">{p.title}</h3>
+          <p className="text-sm opacity-80 line-clamp-3 mt-1">{p.pitch}</p>
+          <div className="mt-2 text-xs opacity-60">{p.category} • {p.status}</div>
         </div>
-        <button onClick={interest} className="text-sm px-3 py-2 rounded bg-black text-white">I'm interested</button>
+        <button onClick={interest} className="btn-primary">I'm interested</button>
       </div>
     </div>
   );

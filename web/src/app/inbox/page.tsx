@@ -37,22 +37,22 @@ export default function InboxPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Inbox</h1>
-      {loading && <p className="text-sm text-gray-500">Loading…</p>}
-      {!loading && items.length === 0 && <p className="text-sm text-gray-500">No requests yet.</p>}
+    <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-4">
+      <h1 className="text-2xl font-semibold tracking-tight">Inbox</h1>
+      {loading && <p className="text-sm opacity-70">Loading…</p>}
+      {!loading && items.length === 0 && <p className="text-sm opacity-70">No requests yet.</p>}
       <ul className="space-y-3">
         {items.map((i) => (
-          <li key={i.id} className="border rounded p-3">
+          <li key={i.id} className="surface p-3">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium">{i.project.title}</div>
-                <div className="text-sm text-gray-600">From {i.fromUser.displayName ?? i.fromUser.handle ?? "User"} • {new Date(i.createdAt).toLocaleString()}</div>
-                <div className="text-xs mt-1">Status: {i.status}</div>
+                <div className="font-medium text-[15px]">{i.project.title}</div>
+                <div className="text-sm opacity-80">From {i.fromUser.displayName ?? i.fromUser.handle ?? "User"} • {new Date(i.createdAt).toLocaleString()}</div>
+                <div className="text-xs mt-1 opacity-60">Status: {i.status}</div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="px-3 py-2 rounded border" onClick={() => act(i.id, "accept")} disabled={i.status !== "pending"}>Accept</button>
-                <button className="px-3 py-2 rounded border" onClick={() => act(i.id, "dismiss")} disabled={i.status !== "pending"}>Dismiss</button>
+                <button className="btn-primary" onClick={() => act(i.id, "accept")} disabled={i.status !== "pending"}>Accept</button>
+                <button className="btn-outline" onClick={() => act(i.id, "dismiss")} disabled={i.status !== "pending"}>Dismiss</button>
               </div>
             </div>
           </li>

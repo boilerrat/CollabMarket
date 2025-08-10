@@ -3,27 +3,87 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/line-clamp";
 
+/* Design tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0b0b;
+  --foreground: #111111;
+  --text: #0f172a; /* slate-900 */
+  --text-inverted: #f8fafc; /* slate-50 */
+  --primary: #6d28d9; /* violet-700 */
+  --primary-foreground: #ffffff;
+  --card: #ffffff;
+  --card-dark: #0a0a0a;
+  --ring: #c084fc; /* violet-300 */
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-foreground: var(--text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #050505;
+    --foreground: #101010;
+    --text: #e5e7eb; /* gray-200 */
+    --text-inverted: #0b0b0b;
+    --card: #0d0d0d;
   }
 }
 
+/* App baseline */
+html, body {
+  height: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Subtle gradient + grid for a modern depth */
+  background-image:
+    radial-gradient(60rem 40rem at 10% -10%, rgba(109, 40, 217, 0.15), transparent 60%),
+    radial-gradient(50rem 30rem at 110% 10%, rgba(59, 130, 246, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.03),
+      rgba(0,0,0,0.03) 1px,
+      transparent 1px,
+      transparent 24px
+    );
+  background-color: #fbfbfb;
+  background-blend-mode: normal, normal, color, normal;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image:
+      radial-gradient(60rem 40rem at 10% -10%, rgba(109, 40, 217, 0.2), transparent 60%),
+      radial-gradient(50rem 30rem at 110% 10%, rgba(59, 130, 246, 0.18), transparent 60%),
+      linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,0.05),
+        rgba(255,255,255,0.05) 1px,
+        transparent 1px,
+        transparent 24px
+      );
+    background-color: #0a0a0a;
+  }
+}
+
+/* Utility: a soft card surface */
+.surface {
+  @apply rounded-xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-neutral-900/60 backdrop-blur;
+}
+
+/* Utility: primary button styling shortcut for places we don't use a component yet */
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg bg-[--primary] text-[--primary-foreground] px-4 py-2 text-sm font-medium shadow-sm hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[--ring] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium hover:bg-black/[.04] dark:hover:bg-white/[.06] focus:outline-none;
 }

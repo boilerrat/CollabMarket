@@ -71,16 +71,14 @@ export function AuthButtons(): React.ReactElement {
   if (user) {
     return (
       <div className="flex items-center gap-3">
-        <div className="text-sm">Signed in as @{user.handle}</div>
-        <button onClick={logout} className="rounded px-3 py-1 text-sm bg-neutral-800 text-white">
-          Logout
-        </button>
+        <div className="text-sm opacity-80">Signed in as @{user.handle}</div>
+        <button onClick={logout} className="btn-outline">Logout</button>
       </div>
     );
   }
 
   return (
-    <button onClick={signIn} className="rounded px-3 py-1 text-sm bg-neutral-800 text-white">
+    <button onClick={signIn} className="btn-primary">
       Sign in with Farcaster
     </button>
   );
