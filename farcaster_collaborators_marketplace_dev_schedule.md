@@ -88,7 +88,7 @@
 **Tasks**
 - [x] DB: interests.
 - [x] API: `POST /api/projects/:id/interest`, `GET /api/inbox`.
-- [x] UI: One-tap Interest with confirm. Owner inbox with accept, dismiss. (interest button on cards; accept/dismiss pending)
+- [x] UI: One-tap Interest with confirm. Owner inbox with accept, dismiss. (inbox actions added)
 - [x] Implement webhook receiver for Mini App events. Send owner notification on new interest. (placeholder receiver added)
 
 **Done**
@@ -104,7 +104,7 @@
 - [x] DB: abuse_reports. Soft delete flags on users, projects, profiles.
 - [x] API: `POST /api/report`. Admin endpoints behind role.
 - [x] Keyword and link checks on submit.
-- [x] Admin view: queue, resolve, shadow ban. (shadow ban endpoints added)
+- [x] Admin view: queue, resolve, shadow ban. (UI added)
 
 **Done**
 - Reported post hidden after admin action.
