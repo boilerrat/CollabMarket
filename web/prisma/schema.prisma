@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id              String   @id @default(uuid()) @map("id")
+  fid             BigInt   @unique @map("fid")
+  handle          String   @map("handle")
+  display_name    String?  @map("display_name")
+  avatar_url      String?  @map("avatar_url")
+  email           String?  @unique @map("email")
+  public_links    Json?    @map("public_links")
+  is_deleted      Boolean  @default(false) @map("is_deleted")
+  created_at      DateTime @default(now()) @map("created_at")
+  updated_at      DateTime @updatedAt @map("updated_at")
+
+  collaborator_profiles collaborator_profiles[]
+  projects              projects[] @relation("user_projects")
+  interests_sent        interests[] @relation("user_interests", fields: [id], references: [from_user_id]) @ignore
+
+  @@map("users")
+}
+
+model collaborator_profiles {
+  id                     String   @id @default(uuid()) @map("id")
+  user_id                String   @unique @map("user_id")
+  skills                 String[] @db.Text @map("skills")
+  bio                    String?  @db.Text @map("bio")
+  availability_hours_week Int      @default(0) @map("availability_hours_week")
+  categories             String[] @db.Text @map("categories")
+  location               String?  @map("location")
+  comp_preference        String?  @map("comp_preference")
+  visibility             String   @default("public") @map("visibility")
+  is_deleted             Boolean  @default(false) @map("is_deleted")
+  created_at             DateTime @default(now()) @map("created_at")
+  updated_at             DateTime @updatedAt @map("updated_at")
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("collaborator_profiles")
+}
+
+model projects {
+  id              String   @id @default(uuid()) @map("id")
+  owner_user_id   String   @map("owner_user_id")
+  title           String   @map("title")
+  pitch           String   @db.Text @map("pitch")
+  category        String   @map("category")
+  onchain         Boolean  @default(false) @map("onchain")
+  repo_url        String?  @map("repo_url")
+  contact_method  String   @map("contact_method")
+  contact_value   String   @map("contact_value")
+  commitment      String   @map("commitment")
+  start_date      DateTime? @map("start_date")
+  incentives      String[] @db.Text @map("incentives")
+  status          String   @default("active") @map("status")
+  is_deleted      Boolean  @default(false) @map("is_deleted")
+  created_at      DateTime @default(now()) @map("created_at")
+  updated_at      DateTime @updatedAt @map("updated_at")
+
+  owner users @relation("user_projects", fields: [owner_user_id], references: [id], onDelete: Cascade)
+  roles project_roles[]
+  interests interests[]
+
+  @@map("projects")
+}
+
+model project_roles {
+  id         String  @id @default(uuid()) @map("id")
+  project_id String  @map("project_id")
+  skill      String  @map("skill")
+  level      String? @map("level")
+  count      Int     @default(1) @map("count")
+
+  project projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@map("project_roles")
+}
+
+model interests {
+  id           String   @id @default(uuid()) @map("id")
+  project_id   String   @map("project_id")
+  from_user_id String   @map("from_user_id")
+  message      String?  @db.Text @map("message")
+  status       String   @default("pending") @map("status")
+  created_at   DateTime @default(now()) @map("created_at")
+
+  project projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  from_user users   @relation(fields: [from_user_id], references: [id], onDelete: Cascade)
+
+  @@map("interests")
+}
+
+model signals {
+  id      String @id @default(uuid()) @map("id")
+  user_id String @map("user_id")
+  type    String @map("type")
+  url     String @map("url")
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("signals")
+}
+
+model abuse_reports {
+  id              String   @id @default(uuid()) @map("id")
+  reporter_user_id String   @map("reporter_user_id")
+  target_kind     String   @map("target_kind")
+  target_id       String   @map("target_id")
+  reason          String   @db.Text @map("reason")
+  created_at      DateTime @default(now()) @map("created_at")
+
+  reporter users @relation(fields: [reporter_user_id], references: [id], onDelete: Cascade)
+
+  @@map("abuse_reports")
+}
