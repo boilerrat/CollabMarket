@@ -28,7 +28,9 @@ model users {
 
   collaborator_profiles collaborator_profiles[]
   projects              projects[] @relation("user_projects")
-  interests_sent        interests[] @relation("user_interests", fields: [id], references: [from_user_id]) @ignore
+  interests_sent        interests[] @relation("user_interests")
+  user_signals          signals[]  @relation("user_signals")
+  reports_made          abuse_reports[] @relation("reporter_user")
 
   @@map("users")
 }
@@ -36,10 +38,10 @@ model users {
 model collaborator_profiles {
   id                     String   @id @default(uuid()) @map("id")
   user_id                String   @unique @map("user_id")
-  skills                 String[] @db.Text @map("skills")
+  skills                 String[] @map("skills")
   bio                    String?  @db.Text @map("bio")
   availability_hours_week Int      @default(0) @map("availability_hours_week")
-  categories             String[] @db.Text @map("categories")
+  categories             String[] @map("categories")
   location               String?  @map("location")
   comp_preference        String?  @map("comp_preference")
   visibility             String   @default("public") @map("visibility")
@@ -64,7 +66,7 @@ model projects {
   contact_value   String   @map("contact_value")
   commitment      String   @map("commitment")
   start_date      DateTime? @map("start_date")
-  incentives      String[] @db.Text @map("incentives")
+  incentives      String[] @map("incentives")
   status          String   @default("active") @map("status")
   is_deleted      Boolean  @default(false) @map("is_deleted")
   created_at      DateTime @default(now()) @map("created_at")
@@ -97,8 +99,8 @@ model interests {
   status       String   @default("pending") @map("status")
   created_at   DateTime @default(now()) @map("created_at")
 
-  project projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  from_user users   @relation(fields: [from_user_id], references: [id], onDelete: Cascade)
+  project   projects @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  from_user users    @relation("user_interests", fields: [from_user_id], references: [id], onDelete: Cascade)
 
   @@map("interests")
 }
@@ -109,7 +111,7 @@ model signals {
   type    String @map("type")
   url     String @map("url")
 
-  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user users @relation("user_signals", fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("signals")
 }
@@ -122,7 +124,7 @@ model abuse_reports {
   reason          String   @db.Text @map("reason")
   created_at      DateTime @default(now()) @map("created_at")
 
-  reporter users @relation(fields: [reporter_user_id], references: [id], onDelete: Cascade)
+  reporter users @relation("reporter_user", fields: [reporter_user_id], references: [id], onDelete: Cascade)
 
   @@map("abuse_reports")
 }
