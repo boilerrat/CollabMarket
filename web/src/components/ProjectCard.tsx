@@ -26,7 +26,7 @@ export function ProjectCard({ p }: { p: Project }) {
   }
 
   return (
-    <div className="surface p-4 hover:shadow-sm transition-shadow">
+    <div className="surface p-6 hover:shadow transition-shadow">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="font-medium text-[15px]">{p.title}</h3>

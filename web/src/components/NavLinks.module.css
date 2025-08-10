@@ -30,7 +30,7 @@
 .btn:hover { filter: brightness(1.05); }
 
 .btnActive {
-  background: linear-gradient(180deg, rgba(109,40,217,.95), rgba(109,40,217,.85));
+  background: linear-gradient(180deg, rgba(109,40,217,.95), rgba(14,165,233,.95));
   color: #fff;
   border-color: transparent;
 }

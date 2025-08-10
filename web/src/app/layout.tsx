@@ -33,7 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-black/40">
+        <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(109,40,217,.08), rgba(14,165,233,.08))" }}>
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
             <Link href="/" className="text-base font-semibold tracking-tight text-gradient no-underline">Collab</Link>
             <div className="ml-auto">
@@ -43,7 +43,7 @@ export default async function RootLayout({
         </header>
         <main className="min-h-[calc(100dvh-56px)]">{children}</main>
         <footer className="border-t mt-12">
-          <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 text-xs opacity-70">
+          <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 text-xs opacity-70">
             Built for Farcaster Mini Apps · MVP
           </div>
         </footer>

@@ -16,7 +16,7 @@ export function CollaboratorCard({ c }: { c: Profile }) {
     try { track("collaborator_view", { id: c.id }); } catch {}
   }
   return (
-    <div className="surface p-4 hover:shadow-sm transition-shadow" onClick={onClick} role="button" tabIndex={0}>
+    <div className="surface p-6 hover:shadow transition-shadow" onClick={onClick} role="button" tabIndex={0}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-medium text-[15px]">{c.user?.displayName ?? c.user?.handle ?? "Collaborator"}</h3>

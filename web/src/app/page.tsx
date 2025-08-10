@@ -6,10 +6,10 @@ export default function Home() {
   return (
     <div className="relative min-h-[calc(100dvh-56px)]">
       <AppInit />
-      <section className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24">
+      <section className="max-w-6xl mx-auto px-4 md:px-8 py-16 md:py-28">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight">
               <span className="text-gradient">Find collaborators.</span> Ship faster.
             </h1>
             <p className="mt-4 text-base opacity-80 max-w-prose">
@@ -24,7 +24,7 @@ export default function Home() {
               <div className="surface p-3 flex items-center gap-2"><span className="chip">☀︎</span> Daily digest</div>
             </div>
           </div>
-          <div className="surface p-6 md:p-8">
+          <div className="surface p-8 md:p-10">
             <Image src="/globe.svg" alt="Illustration" width={160} height={160} className="opacity-80" />
             <p className="mt-4 text-sm opacity-70">Your network, focused on collaboration. No noise.</p>
           </div>

@@ -13,6 +13,8 @@
   --text-inverted: #f8fafc; /* slate-50 */
   --primary: #6d28d9; /* violet-700 */
   --primary-foreground: #ffffff;
+  --accent: #22c55e; /* green-500 */
+  --accent-2: #0ea5e9; /* sky-500 */
   --card: #ffffff;
   --card-dark: #0a0a0a;
   --ring: #c084fc; /* violet-300 */
@@ -45,15 +47,16 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   /* Subtle gradient + grid for a modern depth */
   background-image:
-    radial-gradient(60rem 40rem at 10% -10%, rgba(109, 40, 217, 0.15), transparent 60%),
-    radial-gradient(50rem 30rem at 110% 10%, rgba(59, 130, 246, 0.12), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+    radial-gradient(70rem 40rem at 10% -10%, rgba(109, 40, 217, 0.28), transparent 60%),
+    radial-gradient(60rem 30rem at 110% 10%, rgba(14, 165, 233, 0.24), transparent 60%),
+    radial-gradient(30rem 30rem at -10% 110%, rgba(34,197,94,0.18), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
     repeating-linear-gradient(
       0deg,
       rgba(0,0,0,0.03),
       rgba(0,0,0,0.03) 1px,
       transparent 1px,
-      transparent 24px
+      transparent 28px
     );
   background-color: #fbfbfb;
   background-blend-mode: normal, normal, color, normal;
@@ -84,7 +87,7 @@ a {
 
 /* Utility: a soft card surface */
 .surface {
-  @apply rounded-xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-neutral-900/60 backdrop-blur;
+  @apply rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-neutral-900/60 backdrop-blur shadow-sm;
 }
 
 /* Utility: primary button styling shortcut for places we don't use a component yet */
@@ -98,7 +101,7 @@ a {
 
 /* Fun but subtle gradient text utility */
 .text-gradient {
-  background-image: linear-gradient(90deg, #6d28d9, #2563eb);
+  background-image: linear-gradient(90deg, #6d28d9, #0ea5e9, #22c55e);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
