@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { NavLinks } from "@/components/NavLinks";
 import { getSession } from "@/lib/session";
 import { isAdminByFid } from "@/lib/admin";
 
@@ -34,14 +35,9 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-black/40">
           <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
-            <Link href="/" className="text-base font-semibold tracking-tight text-gradient">Collab</Link>
-            <Link href="/feed" className="opacity-80 hover:opacity-100 transition">Feed</Link>
-            <Link href="/projects" className="opacity-80 hover:opacity-100 transition">Projects</Link>
-            <Link href="/projects/new" className="opacity-80 hover:opacity-100 transition">New</Link>
-            <Link href="/collaborators/me" className="opacity-80 hover:opacity-100 transition">My Profile</Link>
-            <div className="ml-auto flex items-center gap-3">
-              {session && <Link href="/inbox" className="btn-outline">Inbox</Link>}
-              {isAdmin && <Link href="/admin/reports" className="btn-outline">Admin</Link>}
+            <Link href="/" className="text-base font-semibold tracking-tight text-gradient no-underline">Collab</Link>
+            <div className="ml-auto">
+              <NavLinks showInbox={Boolean(session)} showAdmin={isAdmin} />
             </div>
           </nav>
         </header>

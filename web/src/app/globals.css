@@ -59,6 +59,12 @@ body {
   background-blend-mode: normal, normal, color, normal;
 }
 
+/* Reset anchor defaults so button-as-link styles render correctly */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-image:

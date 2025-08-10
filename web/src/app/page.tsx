@@ -17,7 +17,6 @@ export default function Home() {
             </p>
             <div className="mt-6 flex gap-3">
               <AuthButtons />
-              <a href="/feed" className="btn-outline">Browse feed</a>
             </div>
             <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs opacity-90">
               <div className="surface p-3 flex items-center gap-2"><span className="chip">P0</span> Secure by default</div>

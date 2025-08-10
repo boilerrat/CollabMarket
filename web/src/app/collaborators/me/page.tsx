@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { track } from "@vercel/analytics/react";
 
@@ -36,19 +37,41 @@ export default function MyProfilePage() {
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6">
       <h1 className="text-2xl font-semibold tracking-tight mb-4">My Collaborator Profile</h1>
-      <form onSubmit={onSubmit} className="space-y-3 surface p-4" aria-label="Collaborator profile form">
-        <Input aria-label="Skills" placeholder="Skills (comma-separated)" value={skills} onChange={(e) => setSkills(e.target.value)} />
-        <Textarea aria-label="Bio" placeholder="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
-        <Input aria-label="Availability hours per week" type="number" placeholder="Availability hours/week" value={availability} onChange={(e) => setAvailability(Number(e.target.value))} />
-        <label className="block text-sm">Visibility
-          <select aria-label="Visibility" className="w-full bg-transparent border rounded p-2" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-        </label>
-        <Button type="submit">Save</Button>
-      </form>
-      {message && <p className="mt-3 text-sm" role="status">{message}</p>}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Tell others how you like to collaborate</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4" aria-label="Collaborator profile form">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Skills</label>
+              <Input aria-label="Skills" placeholder="e.g. React, Prisma, Product, Design" value={skills} onChange={(e) => setSkills(e.target.value)} />
+              <p className="text-xs opacity-70">Comma-separated. Use broad terms so people can find you.</p>
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Bio</label>
+              <Textarea aria-label="Bio" placeholder="Short intro, what you build, what you’re looking for" value={bio} onChange={(e) => setBio(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Availability (hrs/week)</label>
+                <Input aria-label="Availability hours per week" type="number" placeholder="e.g. 5" value={availability} onChange={(e) => setAvailability(Number(e.target.value))} />
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Visibility</label>
+                <select aria-label="Visibility" className="h-10 w-full bg-transparent border rounded-md px-3 text-sm" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-2 flex justify-end">
+              <Button type="submit">Save changes</Button>
+            </div>
+          </form>
+          {message && <p className="mt-3 text-sm" role="status">{message}</p>}
+        </CardContent>
+      </Card>
     </div>
   );
 }
