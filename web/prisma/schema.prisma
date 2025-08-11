@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  fid           Int?     // optional until we verify
+  handle        String?
+  displayName   String?
+  avatarUrl     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  profiles      CollaboratorProfile[]
+  projects      Project[] @relation("UserProjects")
+  interestsSent Interest[] @relation("InterestsFromUser")
+}
+
+model CollaboratorProfile {
+  id                     String   @id @default(cuid())
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id])
+  bio                    String?
+  skills                 String[]
+  projectTypes           String[]
+  availabilityHoursWeek  Int?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  ownerId     String
+  owner       User     @relation("UserProjects", fields: [ownerId], references: [id])
+  title       String
+  pitch       String
+  projectType String?
+  skills      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  interests   Interest[]
+}
+
+model Interest {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  fromUserId String
+  fromUser   User     @relation("InterestsFromUser", fields: [fromUserId], references: [id])
+  message    String?
+  skillMatch Boolean  @default(false)
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+}
