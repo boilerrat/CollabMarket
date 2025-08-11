@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
+import { createHmac } from "crypto";
 
 // Temporary: store token in an httpOnly cookie for demo purposes.
 // Replace with server-side verification and a signed session cookie.
@@ -11,11 +12,14 @@ export async function POST(req: NextRequest) {
     if (!token) {
       return Response.json({ ok: false, error: "missing token" }, { status: 400 });
     }
-
+    // TODO: verify token server-side per docs and derive user identity from verified claims.
+    const secret = process.env.SESSION_SECRET || "dev-secret-not-for-prod";
+    const sig = createHmac("sha256", secret).update(token).digest("hex");
+    const value = `${token}.${sig}`;
     const cookieStore = await cookies();
     cookieStore.set({
       name: "fc_session",
-      value: token,
+      value,
       httpOnly: true,
       sameSite: "strict",
       path: "/",

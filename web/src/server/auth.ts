@@ -1,9 +1,16 @@
 import { cookies } from "next/headers";
-import { createHash } from "crypto";
+import { createHash, createHmac } from "crypto";
 import { prisma } from "@/server/db";
 
 export async function getSessionToken(): Promise<string | null> {
-  return cookies().get("fc_session")?.value || null;
+  const raw = cookies().get("fc_session")?.value || null;
+  if (!raw) return null;
+  const [token, sig] = raw.split(".");
+  if (!token || !sig) return null;
+  const secret = process.env.SESSION_SECRET || "dev-secret-not-for-prod";
+  const expected = createHmac("sha256", secret).update(token).digest("hex");
+  if (expected !== sig) return null;
+  return token;
 }
 
 export function deriveUserIdFromToken(token: string): string {

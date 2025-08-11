@@ -43,8 +43,14 @@ export default function InboxPage() {
                     <div className="text-muted-foreground">Project: {i.projectId}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline">Accept</Button>
-                    <Button size="sm" variant="ghost">Dismiss</Button>
+                    <Button size="sm" variant="outline" onClick={async () => {
+                      await fetch(`/api/interests/${i.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'accepted' }) });
+                      load();
+                    }}>Accept</Button>
+                    <Button size="sm" variant="ghost" onClick={async () => {
+                      await fetch(`/api/interests/${i.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'dismissed' }) });
+                      load();
+                    }}>Dismiss</Button>
                   </div>
                 </div>
               ))}
