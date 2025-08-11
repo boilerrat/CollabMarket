@@ -23,6 +23,7 @@
   --card: #ffffff;
   --card-dark: #0a0a0a;
   --ring: #8eeff1; /* light aqua for focus ring */
+  --font-display: var(--font-geist-sans);
 }
 
 @theme inline {
@@ -52,16 +53,16 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   font-size: 16px;
   line-height: 1.6;
-  /* Background image with brand tints overlayed for readability */
-  background-image:
-    linear-gradient(180deg, rgba(0,38,41,0.60), rgba(0,38,41,0.45)),
-    radial-gradient(60rem 30rem at 110% 10%, rgba(85,220,223,0.25), transparent 60%),
-    radial-gradient(40rem 30rem at -10% 110%, rgba(0,104,110,0.20), transparent 40%),
-    url('/bg.png');
   background-color: var(--brand-deep);
-  background-size: cover, 100% 100%, 100% 100%, cover;
-  background-position: center, center, center, center;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+}
+
+/* Display font utility and heading style */
+.font-display {
+  font-family: var(--font-display), var(--font-geist-sans), ui-sans-serif, system-ui;
+  letter-spacing: -0.01em;
+}
+:is(h1,h2,h3).display, .display:is(h1,h2,h3) {
+  font-family: var(--font-display), var(--font-geist-sans), ui-sans-serif, system-ui;
 }
 
 @media (min-width: 480px) {
@@ -79,17 +80,6 @@ a {
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-image:
-      radial-gradient(60rem 40rem at 10% -10%, rgba(109, 40, 217, 0.2), transparent 60%),
-      radial-gradient(50rem 30rem at 110% 10%, rgba(59, 130, 246, 0.18), transparent 60%),
-      linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-      repeating-linear-gradient(
-        0deg,
-        rgba(255,255,255,0.05),
-        rgba(255,255,255,0.05) 1px,
-        transparent 1px,
-        transparent 24px
-      );
     background-color: #0a0a0a;
   }
 }
@@ -103,15 +93,10 @@ a {
 /* Elevated app panel to improve readability over the background */
 .panel {
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(10, 20, 22, 0.62);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-}
-@media (prefers-color-scheme: dark) {
-  .panel {
-    background: rgba(10, 20, 22, 0.6);
-    border-color: rgba(255, 255, 255, 0.16);
-  }
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e6f6f7;
 }
 
 /* Bottom tab bar for Mini App feel */
@@ -150,13 +135,88 @@ a {
   border-color: transparent;
 }
 
+/* Centered app shell + panel that should always be centered */
+.container-1120 { width: 100%; max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; }
+.container-900 { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; }
+.app-shell {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.app-panel {
+  width: 100% !important; /* fill the container so it always aligns under nav */
+  box-sizing: border-box !important;
+  margin: 24px 0 !important;
+  border-radius: 16px !important;
+  background: rgba(10,20,22,0.62) !important;
+  color: #e6f6f7 !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important; /* center children horizontally */
+}
+
+/* Ensure content inside panels stays centered and responsive */
+.app-panel > * { width: 100%; margin-left: auto; margin-right: auto; }
+
+/* Forms: consistent spacing and alignment */
+.app-panel form {
+  width: min(760px, 100%);
+  margin: 16px auto;
+  display: grid;
+  gap: 12px;
+}
+.app-panel form .row {
+  display: grid;
+  gap: 8px;
+}
+.app-panel form label { text-align: left; font-weight: 600; opacity: 0.9; }
+.app-panel form input,
+.app-panel form select,
+.app-panel form textarea {
+  @apply block w-full rounded-xl border border-white/20 bg-white/92 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[--ring];
+  color: #0f172a;
+}
+.app-panel form .actions { display: flex; gap: 10px; justify-content: center; }
+
+/* Funky animated background */
+.funky-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(1200px 800px at -10% 20%, rgba(255, 175, 204, 0.18), transparent 60%),
+              radial-gradient(1000px 700px at 110% 0%, rgba(85, 220, 223, 0.2), transparent 55%),
+              radial-gradient(900px 700px at 50% 120%, rgba(147, 197, 253, 0.18), transparent 50%),
+              linear-gradient(180deg, rgba(0, 38, 41, 0.65), rgba(0, 38, 41, 0.75));
+}
+.funky-bg::before {
+  content: "";
+  position: absolute;
+  inset: -20% -20% -20% -20%;
+  background: conic-gradient(from 0deg at 50% 50%, #55dcdf33, #a78bfa33, #f472b633, #55dcdf33);
+  filter: blur(60px);
+  animation: spinSlow 24s linear infinite;
+}
+.funky-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 15% 85%, rgba(255,255,255,0.06), transparent 40%),
+              radial-gradient(circle at 85% 15%, rgba(255,255,255,0.05), transparent 40%);
+  mix-blend-mode: screen;
+}
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+
 /* Utility: primary button styling shortcut for places we don't use a component yet */
 .btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg bg-[--primary] text-[--primary-foreground] px-4 py-2 text-sm font-medium shadow-sm hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[--ring] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black disabled:opacity-60 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center rounded-xl bg-[--primary] text-[--primary-foreground] px-4 py-2 text-sm font-medium shadow-md transition-transform transition-colors ease-out duration-150 hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[--ring] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black disabled:opacity-60 disabled:cursor-not-allowed;
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium hover:bg-black/[.04] dark:hover:bg-white/[.06] focus:outline-none;
+  @apply inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium transition-all ease-out duration-150 hover:bg-black/[.04] dark:hover:bg-white/[.06] hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[--ring] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black;
 }
 
 /* Fun but subtle gradient text utility */
@@ -166,6 +226,9 @@ a {
   background-clip: text;
   color: transparent;
 }
+
+/* Smooth link hover for headers/nav */
+a:hover { opacity: 0.9; }
 
 /* Tiny chips/badges */
 .chip {

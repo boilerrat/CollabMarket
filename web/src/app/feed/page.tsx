@@ -34,9 +34,9 @@ export default function FeedPage() {
   useEffect(() => { load(); /* initial */ }, [tab]);
 
   return (
-    <div className="panel space-y-5 text-[18px] leading-7">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">Discover</h1>
+    <div className="panel max-w-3xl mx-auto p-4 md:p-6 space-y-5 text-[18px] leading-7 text-center" style={{ maxWidth: 900, margin: "0 auto" }}>
+      <h1 className="text-3xl font-semibold tracking-tight">Discover</h1>
+      <div className="flex justify-center">
         <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
           <TabsList>
             <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -44,8 +44,8 @@ export default function FeedPage() {
           </TabsList>
         </Tabs>
       </div>
-      <div className="surface p-2 flex gap-2 items-center">
-        <Input aria-label="Search" className="flex-1 bg-transparent border-0 focus:ring-0 px-2" placeholder="Search by title, pitch, skills" value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="surface p-2 flex gap-2 items-center justify-center">
+        <Input aria-label="Search" className="w-full max-w-md bg-transparent border-0 focus:ring-0 px-2" placeholder="Search by title, pitch, skills" value={q} onChange={(e) => setQ(e.target.value)} />
         <Button onClick={load} disabled={loading}>{loading ? "Searching…" : "Search"}</Button>
       </div>
       {loading && <p className="text-sm opacity-70">Loading…</p>}

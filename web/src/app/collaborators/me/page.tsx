@@ -35,7 +35,7 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div className="panel max-w-3xl mx-auto p-4 md:p-8">
+    <div className="panel max-w-3xl mx-auto p-4 md:p-8" style={{ maxWidth: 900 }}>
       <h1 className="text-2xl font-semibold tracking-tight mb-4">My Collaborator Profile</h1>
       <Card>
         <CardHeader className="pb-2">

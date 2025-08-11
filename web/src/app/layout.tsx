@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { NavLinks } from "@/components/NavLinks";
 import { getSession } from "@/lib/session";
 import { isAdminByFid } from "@/lib/admin";
 import { Background } from "@/components/Background";
-import { TabBar } from "@/components/TabBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +15,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Playful, modern display font for brand and headings
+const display = Space_Grotesk({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,29 +40,23 @@ export default async function RootLayout({
   // This is safe and lightweight; header values are exposed for clients if needed
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} style={{ color: "#ffffff" }}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <Background />
         <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))" }}>
-          <nav className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex items-center gap-4 text-sm">
-            <Link href="/" className="text-base font-semibold tracking-tight text-gradient no-underline">Collab</Link>
-            <div className="ml-auto">
-              <NavLinks showInbox={Boolean(session)} showAdmin={isAdmin} />
-            </div>
+          <nav className="container-1120 py-3 flex flex-col items-center gap-3 text-sm">
+            <NavLinks showInbox={Boolean(session)} showAdmin={isAdmin} />
           </nav>
         </header>
-        <main className="min-h-[calc(100dvh-56px)] w-full grid place-items-start">
-          <div className="w-full max-w-screen-md md:max-w-screen-lg lg:max-w-screen-xl mx-4 md:mx-6 my-6 md:my-8 rounded-2xl bg-white/80 dark:bg-black/40 shadow-xl border border-white/20 text-black px-5 md:px-8 py-6 md:py-10">
-            {children}
+        <main className="min-h-[calc(100dvh-56px)] w-full">
+          <div className="container-1120">
+            <div className="app-panel">
+              <div className="container-900">
+                {children}
+              </div>
+            </div>
           </div>
         </main>
-        <div className="mx-auto w-full max-w-[960px]">
-          <TabBar />
-        </div>
-        <footer className="border-t mt-12">
-          <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 text-xs opacity-70">
-            Built for Farcaster Mini Apps · MVP
-          </div>
-        </footer>
+        {/* footer removed per request */}
       </body>
     </html>
   );

@@ -11,7 +11,7 @@ async function fetchProjects() {
 export default async function ProjectsPage() {
   const { items } = await fetchProjects();
   return (
-    <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-4">
+    <div className="panel max-w-3xl mx-auto p-4 md:p-6 space-y-4" style={{ maxWidth: 900 }}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
         <Link href="/projects/new" className="btn-primary text-sm">New Project</Link>

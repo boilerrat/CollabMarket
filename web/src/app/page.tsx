@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="relative min-h-[calc(100dvh-56px)]">
       <AppInit />
-      <section className="panel mx-auto py-10 md:py-16">
+      <section className="panel mx-auto py-10 md:py-16" style={{ maxWidth: 900 }}>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
