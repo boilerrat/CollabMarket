@@ -1,8 +1,10 @@
 {
   "name": "CollabMarket",
-  "iconUrl": "/favicon.ico",
-  "homescreenUrl": "/",
   "description": "Farcaster Collaborators Marketplace",
+  "iconUrl": "/favicon.ico",
+  "splashImageUrl": "/favicon.ico",
+  "homescreenUrl": "/",
+  "webhookUrl": "/api/miniapp/webhook",
   "supportedApis": ["miniapp.v1"]
 }
 

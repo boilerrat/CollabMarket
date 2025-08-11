@@ -4,18 +4,36 @@ import { getOrCreateUserId } from "@/server/auth";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const q = (searchParams.get("q") || "").toLowerCase();
-  const skills = (searchParams.get("skills") || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-  const projectType = (searchParams.get("type") || "").toLowerCase();
+  const q = searchParams.get("q") || "";
+  const skills = (searchParams.get("skills") || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const projectType = searchParams.get("type") || "";
+  const archivedParam = searchParams.get("archived");
+  const showArchived = archivedParam === "1" || archivedParam === "true";
+  const page = Math.max(1, Number(searchParams.get("page") || 1));
+  const per = Math.min(50, Math.max(1, Number(searchParams.get("per") || 10)));
 
-  const all = await prisma.project.findMany({ orderBy: { createdAt: "desc" } });
-  const list = all.filter((p) => {
-    if (q && !(`${p.title} ${p.pitch}`.toLowerCase().includes(q))) return false;
-    if (projectType && (p.projectType || "").toLowerCase() !== projectType) return false;
-    if (skills.length && !skills.every((s) => (p.skills || []).map((x) => x.toLowerCase()).includes(s))) return false;
-    return true;
+  const where: any = {};
+  if (!showArchived) where.archived = false;
+  if (projectType) where.projectType = projectType;
+  if (skills.length) where.skills = { hasEvery: skills };
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { pitch: { contains: q, mode: "insensitive" } },
+    ];
+  }
+
+  const list = await prisma.project.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    include: { owner: true },
+    skip: (page - 1) * per,
+    take: per,
   });
-  return Response.json({ ok: true, projects: list });
+  return Response.json({ ok: true, projects: list, page, per, hasMore: list.length === per });
 }
 
 export async function POST(req: NextRequest) {

@@ -41,24 +41,32 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: false, error: "display_name and handle are required" }, { status: 400 });
   }
 
-  const user = await prisma.user.upsert({ where: { id: userId }, update: { handle: handle || undefined, displayName: display_name || undefined }, create: { id: userId, handle, displayName: display_name } });
-  const profile = await prisma.collaboratorProfile.upsert({
-    where: { userId },
-    update: {
-      bio,
-      skills,
-      projectTypes: project_types,
-      availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
-    },
-    create: {
-      userId: user.id,
-      bio,
-      skills,
-      projectTypes: project_types,
-      availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
-    },
-  });
-  return Response.json({ ok: true, profile });
+  try {
+    const user = await prisma.user.upsert({ where: { id: userId }, update: { handle: handle || undefined, displayName: display_name || undefined }, create: { id: userId, handle, displayName: display_name } });
+    const existing = await prisma.collaboratorProfile.findFirst({ where: { userId: user.id } });
+    const profile = existing
+      ? await prisma.collaboratorProfile.update({
+          where: { id: existing.id },
+          data: {
+            bio,
+            skills,
+            projectTypes: project_types,
+            availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
+          },
+        })
+      : await prisma.collaboratorProfile.create({
+          data: {
+            userId: user.id,
+            bio,
+            skills,
+            projectTypes: project_types,
+            availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
+          },
+        });
+    return Response.json({ ok: true, profile });
+  } catch (err: any) {
+    return Response.json({ ok: false, error: err?.message || "failed" }, { status: 500 });
+  }
 }
 
 

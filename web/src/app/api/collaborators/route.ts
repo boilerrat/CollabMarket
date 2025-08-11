@@ -3,20 +3,41 @@ import { prisma } from "@/server/db";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const q = (searchParams.get("q") || "").toLowerCase();
+  const q = (searchParams.get("q") || "").trim();
   const skills = (searchParams.get("skills") || "")
     .split(",")
-    .map((s) => s.trim().toLowerCase())
+    .map((s) => s.trim())
     .filter(Boolean);
-  const projectType = (searchParams.get("type") || "").toLowerCase();
+  const projectType = (searchParams.get("type") || "").trim();
+  const page = Math.max(1, Number(searchParams.get("page") || 1));
+  const per = Math.min(50, Math.max(1, Number(searchParams.get("per") || 10)));
 
-  const all = await prisma.collaboratorProfile.findMany({ include: { user: true } });
-  const list = all.filter((p) => {
-    if (q && !(`${p.user?.displayName || ""} ${p.user?.handle || ""} ${p.bio || ""}`.toLowerCase().includes(q))) return false;
-    if (projectType && !(p.projectTypes || []).map((t) => t.toLowerCase()).includes(projectType)) return false;
-    if (skills.length && !skills.every((s) => (p.skills || []).map((x) => x.toLowerCase()).includes(s))) return false;
-    return true;
-  }).map((p) => ({
+  const where: any = {};
+  if (projectType) where.projectTypes = { has: projectType };
+  if (skills.length) where.skills = { hasEvery: skills };
+  if (q) {
+    where.OR = [
+      { bio: { contains: q, mode: "insensitive" } },
+      {
+        user: {
+          OR: [
+            { displayName: { contains: q, mode: "insensitive" } },
+            { handle: { contains: q, mode: "insensitive" } },
+          ],
+        },
+      },
+    ];
+  }
+
+  const list = await prisma.collaboratorProfile.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    include: { user: true },
+    skip: (page - 1) * per,
+    take: per,
+  });
+
+  const collaborators = list.map((p) => ({
     userKey: p.userId,
     display_name: p.user?.displayName || "",
     handle: p.user?.handle || "",
@@ -25,7 +46,7 @@ export async function GET(req: NextRequest) {
     project_types: p.projectTypes || [],
   }));
 
-  return Response.json({ ok: true, collaborators: list });
+  return Response.json({ ok: true, collaborators, page, per, hasMore: list.length === per });
 }
 
 

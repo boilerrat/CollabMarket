@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { SkillsMultiSelect } from "@/components/skills-multiselect";
 
 type ProfileForm = {
   display_name: string;
@@ -58,7 +59,10 @@ export default function ProfilePage() {
       const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to save");
@@ -92,8 +96,12 @@ export default function ProfilePage() {
               <Textarea id="bio" rows={4} value={form.bio} onChange={onChange("bio")} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="skills">Skills (comma-separated)</Label>
-              <Input id="skills" value={form.skills} onChange={onChange("skills")} />
+              <Label>Skills</Label>
+              <SkillsMultiSelect
+                selected={form.skills ? form.skills.split(',').map((s) => s.trim()).filter(Boolean) : []}
+                onChange={(skills) => setForm((f) => ({ ...f, skills: skills.join(', ') }))}
+                options={["React","Next.js","TypeScript","Tailwind","Design","Solidity","Python"]}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="availability_hours_week">Availability (hours/week)</Label>
