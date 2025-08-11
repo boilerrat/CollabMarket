@@ -48,7 +48,9 @@ export default function Home() {
                 <CardDescription>Create a new project listing.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button>Start</Button>
+                <Button asChild>
+                  <Link href="/projects/new">Start</Link>
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

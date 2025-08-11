@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function NewProjectPage() {
   const [title, setTitle] = useState("");
@@ -15,10 +17,17 @@ export default function NewProjectPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const router = useRouter();
+
   const submit = async () => {
     setSaving(true);
     setMessage(null);
     try {
+      if (!title.trim() || !pitch.trim()) {
+        toast.error("Title and pitch are required");
+        setSaving(false);
+        return;
+      }
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -35,9 +44,11 @@ export default function NewProjectPage() {
       setPitch("");
       setProjectType("");
       setSkills("");
-      setMessage("Created");
+      toast.success("Project created");
+      router.push("/projects");
     } catch (err: any) {
       setMessage(err?.message || "Failed to create");
+      toast.error(err?.message || "Failed to create");
     } finally {
       setSaving(false);
     }
@@ -68,8 +79,9 @@ export default function NewProjectPage() {
               <Label htmlFor="skills">Required Skills (comma-separated)</Label>
               <Input id="skills" value={skills} onChange={(e) => setSkills(e.target.value)} />
             </div>
-            <div>
+            <div className="flex gap-2">
               <Button onClick={submit} disabled={saving}>{saving ? "Creating..." : "Create Project"}</Button>
+              <Button type="button" variant="outline" onClick={() => router.push("/projects")}>Cancel</Button>
             </div>
             {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
           </CardContent>
