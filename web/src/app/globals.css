@@ -135,51 +135,8 @@ a {
   border-color: transparent;
 }
 
-/* Centered app shell + panel that should always be centered */
-.container-1120 { width: 100%; max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; }
-.container-900 { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; padding-left: 16px; padding-right: 16px; }
-.app-shell {
-  display: flex !important;
-  justify-content: center !important;
-}
-
-.app-panel {
-  width: 100% !important; /* fill the container so it always aligns under nav */
-  box-sizing: border-box !important;
-  margin: 24px 0 !important;
-  border-radius: 16px !important;
-  background: rgba(10,20,22,0.62) !important;
-  color: #e6f6f7 !important;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.25) !important;
-  border: 1px solid rgba(255,255,255,0.18) !important;
-  padding: 24px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important; /* center children horizontally */
-}
-
-/* Ensure content inside panels stays centered and responsive */
-.app-panel > * { width: 100%; margin-left: auto; margin-right: auto; }
-
-/* Forms: consistent spacing and alignment */
-.app-panel form {
-  width: min(760px, 100%);
-  margin: 16px auto;
-  display: grid;
-  gap: 12px;
-}
-.app-panel form .row {
-  display: grid;
-  gap: 8px;
-}
-.app-panel form label { text-align: left; font-weight: 600; opacity: 0.9; }
-.app-panel form input,
-.app-panel form select,
-.app-panel form textarea {
-  @apply block w-full rounded-xl border border-white/20 bg-white/92 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[--ring];
-  color: #0f172a;
-}
-.app-panel form .actions { display: flex; gap: 10px; justify-content: center; }
+/* Container utilities */
+/* Intentionally left blank – custom container helpers removed in favor of Tailwind classes */
 
 /* Funky animated background */
 .funky-bg {

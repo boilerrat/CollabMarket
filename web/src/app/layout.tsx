@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
 import { NavLinks } from "@/components/NavLinks";
 import { getSession } from "@/lib/session";
 import { isAdminByFid } from "@/lib/admin";
@@ -42,18 +41,17 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <Background />
-        <header className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40" style={{ backgroundImage: "linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))" }}>
-          <nav className="container-1120 py-3 flex flex-col items-center gap-3 text-sm">
+        <header
+          className="sticky top-0 z-40 border-b backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-black/40"
+          style={{ backgroundImage: 'linear-gradient(90deg, rgba(0,104,110,.18), rgba(85,220,223,.18))' }}
+        >
+          <nav className="w-full max-w-[900px] mx-auto py-3 px-4 flex flex-col items-center gap-3 text-sm">
             <NavLinks showInbox={Boolean(session)} showAdmin={isAdmin} />
           </nav>
         </header>
-        <main className="min-h-[calc(100dvh-56px)] w-full">
-          <div className="container-1120">
-            <div className="app-panel">
-              <div className="container-900">
-                {children}
-              </div>
-            </div>
+        <main className="min-h-[calc(100dvh-56px)] w-full px-4 flex justify-center">
+          <div className="w-full max-w-[900px]">
+            {children}
           </div>
         </main>
         {/* footer removed per request */}
