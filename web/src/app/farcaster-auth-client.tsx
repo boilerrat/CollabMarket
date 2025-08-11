@@ -25,12 +25,15 @@ export function FarcasterAuthClient(): null {
     const run = async () => {
       // If not running inside a Farcaster client, silently exit
       try {
+        if (process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_QUICK_AUTH_DEV !== "1") {
+          return; // avoid SDK quick auth during local dev unless explicitly enabled
+        }
         // Attempt Quick Auth automatically; method name may vary by SDK version
         // Use defensive access to avoid hard type coupling
         const quickAuth: any = (sdk as any).quickAuth;
         let token: string | undefined;
         if (quickAuth?.getToken) {
-          token = await quickAuth.getToken();
+          token = await quickAuth.getToken().catch(() => undefined);
         } else if (quickAuth?.signIn) {
           const result = await quickAuth.signIn();
           token = result?.token ?? result?.jwt;

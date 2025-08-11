@@ -28,7 +28,7 @@ model User {
 
 model CollaboratorProfile {
   id                     String   @id @default(cuid())
-  userId                 String
+  userId                 String   @unique
   user                   User     @relation(fields: [userId], references: [id])
   bio                    String?
   skills                 String[]
@@ -46,6 +46,8 @@ model Project {
   pitch       String
   projectType String?
   skills      String[]
+  status      String   @default("active")
+  archived    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   interests   Interest[]

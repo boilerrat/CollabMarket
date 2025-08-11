@@ -3,7 +3,8 @@ import { createHash, createHmac } from "crypto";
 import { prisma } from "@/server/db";
 
 export async function getSessionToken(): Promise<string | null> {
-  const raw = cookies().get("fc_session")?.value || null;
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("fc_session")?.value || null;
   if (!raw) return null;
   const [token, sig] = raw.split(".");
   if (!token || !sig) return null;
@@ -20,7 +21,14 @@ export function deriveUserIdFromToken(token: string): string {
 
 export async function getOrCreateUserId(): Promise<string | null> {
   const token = await getSessionToken();
-  if (!token) return null;
+  if (!token) {
+    if (process.env.NODE_ENV !== "production") {
+      const id = "usr_dev_local";
+      await prisma.user.upsert({ where: { id }, update: {}, create: { id, handle: "dev", displayName: "Dev User" } });
+      return id;
+    }
+    return null;
+  }
   const id = deriveUserIdFromToken(token);
   await prisma.user.upsert({
     where: { id },
