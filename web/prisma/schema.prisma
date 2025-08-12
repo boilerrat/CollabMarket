@@ -24,6 +24,7 @@ model User {
   profiles      CollaboratorProfile[]
   projects      Project[] @relation("UserProjects")
   interestsSent Interest[] @relation("InterestsFromUser")
+  payments      Payment[]
 }
 
 model CollaboratorProfile {
@@ -63,4 +64,17 @@ model Interest {
   skillMatch Boolean  @default(false)
   status     String   @default("pending")
   createdAt  DateTime @default(now())
+}
+
+model Payment {
+  id           String   @id @default(cuid())
+  txHash       String   @unique
+  action       String   // "project" | "profile"
+  payerAddress String
+  amount       BigInt
+  blockNumber  BigInt
+  blockTime    DateTime
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
 }

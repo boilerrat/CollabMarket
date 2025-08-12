@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
+import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -51,6 +52,19 @@ export async function POST(req: NextRequest) {
   const pitch = (data.pitch || "").trim();
   const skills = Array.isArray(data.skills) ? data.skills : [];
   if (!title || !pitch) return Response.json({ ok: false, error: "title and pitch required" }, { status: 400 });
+
+  // Fee gating
+  const feeCfg = await getFeeConfig();
+  if (feeCfg.enabled) {
+    const paymentTx = (new URL(req.url).searchParams.get("payment_tx") || "").trim();
+    if (!paymentTx) return Response.json({ ok: false, error: "payment_tx required" }, { status: 402 });
+    try {
+      await verifyAndRecordPayment({ txHash: paymentTx, expectedAction: "project", userId: ownerId });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "payment verification failed";
+      return Response.json({ ok: false, error: message }, { status: 402 });
+    }
+  }
   const project = await prisma.project.create({
     data: {
       ownerId,

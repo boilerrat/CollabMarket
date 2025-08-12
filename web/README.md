@@ -20,6 +20,27 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Fee Gating (On-chain)
+
+Server-side verifies payments to the `PostingFee` contract by reading `FeePaid` events via viem.
+
+Environment variables required:
+
+```
+CHAIN_RPC_URL=...           # RPC URL for the target chain
+CHAIN_ID=84532              # e.g., Base Sepolia
+POSTING_FEE_CONTRACT=0x...  # deployed PostingFee address
+USDC_CONTRACT=0x...         # USDC token used by the contract
+DATABASE_URL=...
+```
+
+Endpoints requiring payment when fees are enabled:
+- `POST /api/profile?payment_tx=0x...` (action: "profile")
+- `POST /api/projects?payment_tx=0x...` (action: "project")
+
+Helper endpoint:
+- `GET /api/fees` returns `{ enabled, price, contract, token, chainId }` for the UI to display price and prompt for tx hash.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

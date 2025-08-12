@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
+import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
 
 export async function GET() {
   const userId = await getOrCreateUserId();
@@ -49,6 +50,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Fee gating
+    const feeCfg = await getFeeConfig();
+    if (feeCfg.enabled) {
+      const paymentTx = (new URL(req.url).searchParams.get("payment_tx") || "").trim();
+      if (!paymentTx) return Response.json({ ok: false, error: "payment_tx required" }, { status: 402 });
+      await verifyAndRecordPayment({ txHash: paymentTx, expectedAction: "profile", userId });
+    }
+
     const user = await prisma.user.upsert({ where: { id: userId }, update: { handle: handle || undefined, displayName: display_name || undefined }, create: { id: userId, handle, displayName: display_name } });
     const existing = await prisma.collaboratorProfile.findFirst({ where: { userId: user.id } });
     const profile = existing

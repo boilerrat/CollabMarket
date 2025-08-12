@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
+import { payPostingFeeWithFarcasterWallet } from "@/lib/wallet";
 
 type ProfileForm = {
   display_name: string;
@@ -29,6 +30,9 @@ export default function ProfilePage() {
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [feeCfg, setFeeCfg] = useState<{ enabled: boolean; price: string; token: string | null; chainId: number | null } | null>(null);
+  const [paymentTx, setPaymentTx] = useState("");
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     const fillFromFarcaster = async () => {
@@ -53,6 +57,20 @@ export default function ProfilePage() {
     fillFromFarcaster();
   }, []);
 
+  useEffect(() => {
+    const loadFees = async () => {
+      try {
+        const res = await fetch("/api/fees");
+        const data = await res.json();
+        if (data?.ok && data?.fees) {
+          const price = typeof data.fees.price === "number" ? String(data.fees.price) : data.fees.price?.toString?.() || "";
+          setFeeCfg({ enabled: Boolean(data.fees.enabled), price, token: data.fees.token || null, chainId: data.fees.chainId || null });
+        }
+      } catch {}
+    };
+    loadFees();
+  }, []);
+
   const onChange = (key: keyof ProfileForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = key === "availability_hours_week" ? Number(e.target.value) || "" : e.target.value;
     setForm((f) => ({ ...f, [key]: value }));
@@ -62,7 +80,14 @@ export default function ProfilePage() {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/profile", {
+      if (feeCfg?.enabled && !paymentTx.trim()) {
+        setMessage("Please paste your payment transaction hash");
+        setSaving(false);
+        return;
+      }
+      const url = new URL("/api/profile", window.location.origin);
+      if (feeCfg?.enabled && paymentTx.trim()) url.searchParams.set("payment_tx", paymentTx.trim());
+      const res = await fetch(url.toString(), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -114,6 +139,37 @@ export default function ProfilePage() {
               <Label htmlFor="availability_hours_week">Availability (hours/week)</Label>
               <Input id="availability_hours_week" inputMode="numeric" value={String(form.availability_hours_week)} onChange={onChange("availability_hours_week")} />
             </div>
+            {feeCfg?.enabled ? (
+              <div className="grid gap-2">
+                <Label htmlFor="payment_tx">Payment Transaction Hash</Label>
+                <Input id="payment_tx" placeholder="0x..." value={paymentTx} onChange={(e) => setPaymentTx(e.target.value)} />
+                <p className="text-xs text-muted-foreground">
+                  A small fee is required to post your profile. Price: {feeCfg.price ? `${Number(feeCfg.price) / 1_000_000} USDC` : "USDC"}. Paste the tx hash after paying.
+                </p>
+                <div>
+                  <Button type="button" variant="secondary" disabled={paying} onClick={async () => {
+                    if (!feeCfg?.chainId || !feeCfg?.token || !feeCfg?.price) return;
+                    setPaying(true);
+                    try {
+                      const hash = await payPostingFeeWithFarcasterWallet({
+                        chainId: feeCfg.chainId,
+                        usdc: feeCfg.token,
+                        postingFee: (await (await fetch("/api/fees")).json()).fees.contract,
+                        amount: BigInt(feeCfg.price),
+                        action: "profile",
+                      });
+                      setPaymentTx(hash);
+                      
+                    } catch (e) {
+                      // eslint-disable-next-line no-console
+                      console.error(e);
+                    } finally {
+                      setPaying(false);
+                    }
+                  }}>Pay with Farcaster Wallet</Button>
+                </div>
+              </div>
+            ) : null}
             <div className="flex gap-2">
               <Button onClick={onSubmit} disabled={saving}>{saving ? "Saving..." : "Save Profile"}</Button>
             </div>
