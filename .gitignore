@@ -76,3 +76,8 @@ docker-data/
 *.github
 
 
+# --- Hardhat ---
+smart-contract/cache/
+smart-contract/artifacts/
+
+
