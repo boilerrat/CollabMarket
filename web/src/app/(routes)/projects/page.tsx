@@ -15,6 +15,7 @@ type Project = {
   projectType?: string;
   skills: string[];
   owner?: { handle?: string | null; displayName?: string | null };
+  roles?: Array<{ id: string; skill: string; level?: string | null; count: number }>;
 };
 
 export default function ProjectsPage() {
@@ -80,6 +81,12 @@ export default function ProjectsPage() {
                   <p className="mb-2 text-xs text-muted-foreground">
                     by <a className="underline" href={`https://warpcast.com/${p.owner.handle}`} target="_blank" rel="noopener noreferrer">@{p.owner.handle}</a>
                   </p>
+                ) : null}
+                {p.roles?.length ? (
+                  <div className="mb-2 text-xs text-muted-foreground">
+                    Roles: {p.roles.slice(0, 3).map((r) => `${r.skill}${r.level ? ` (${r.level})` : ""}${r.count && r.count > 1 ? ` ×${r.count}` : ""}`).join(", ")}
+                    {p.roles.length > 3 ? " …" : ""}
+                  </div>
                 ) : null}
                 <Button asChild size="sm">
                   <Link href={`/projects/${p.id}`}>View details</Link>

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
+import { profileUpsertSchema } from "@/app/api/_validation";
 
 export async function GET() {
   const userId = await getOrCreateUserId();
@@ -14,45 +15,39 @@ export async function POST(req: NextRequest) {
   const userId = await getOrCreateUserId();
   if (!userId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
 
-  let data: {
-    display_name?: string;
-    handle?: string;
-    bio?: string;
-    skills?: string[] | string;
-    project_types?: string[] | string;
-    availability_hours_week?: number | string;
-    links?: Array<{ label?: string; url: string }> | string;
-  };
+  let data: unknown;
   try {
     data = await req.json();
   } catch {
     return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
   }
+  const parsed = profileUpsertSchema.safeParse(data);
+  if (!parsed.success) return Response.json({ ok: false, error: "invalid input" }, { status: 400 });
 
-  const display_name = String(data?.display_name || "").trim();
-  const handle = String(data?.handle || "").trim();
-  const bio = String(data?.bio || "");
-  const skills: string[] = Array.isArray(data?.skills)
-    ? data.skills.map((s) => String(s).trim()).filter(Boolean)
-    : String(data?.skills || "")
+  const display_name = String(parsed.data?.display_name || "").trim();
+  const handle = String(parsed.data?.handle || "").trim();
+  const bio = String(parsed.data?.bio || "");
+  const skills: string[] = Array.isArray(parsed.data?.skills)
+    ? parsed.data.skills.map((s) => String(s).trim()).filter(Boolean)
+    : String(parsed.data?.skills || "")
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-  const project_types: string[] = Array.isArray(data?.project_types)
-    ? data.project_types.map((s) => String(s).trim()).filter(Boolean)
-    : String(data?.project_types || "")
+  const project_types: string[] = Array.isArray(parsed.data?.project_types)
+    ? parsed.data.project_types.map((s) => String(s).trim()).filter(Boolean)
+    : String(parsed.data?.project_types || "")
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-  const availability_hours_week = Number(data?.availability_hours_week);
+  const availability_hours_week = Number(parsed.data?.availability_hours_week);
   // Parse links: accept array of objects or comma-separated URLs
   let links: Array<{ label?: string; url: string }> | undefined;
-  if (Array.isArray(data?.links)) {
-    links = data.links
+  if (Array.isArray(parsed.data?.links)) {
+    links = parsed.data.links
       .map((l) => ({ label: l?.label ? String(l.label).trim() : undefined, url: String(l?.url || "").trim() }))
       .filter((l) => !!l.url);
-  } else if (typeof data?.links === "string" && data.links.trim().length) {
-    links = String(data.links)
+  } else if (typeof parsed.data?.links === "string" && parsed.data.links.trim().length) {
+    links = String(parsed.data.links)
       .split(",")
       .map((u) => ({ url: u.trim() }))
       .filter((l) => !!l.url);

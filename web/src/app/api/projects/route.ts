@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
+import { newProjectSchema, type NewProjectInput } from "@/app/api/_validation";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -16,16 +17,37 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, Number(searchParams.get("page") || 1));
   const per = Math.min(50, Math.max(1, Number(searchParams.get("per") || 10)));
 
+  // If q is present, use Postgres FTS + trigram for better search
+  if (q.trim().length) {
+    const offset = (page - 1) * per;
+    // Compose raw SQL with parameters to leverage indexes
+    const ids = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT p."id"
+      FROM "Project" p
+      WHERE
+        ${(showArchived ? prisma.$queryRaw`TRUE` : prisma.$queryRaw`p."archived" = FALSE`)}
+        AND ${(projectType ? prisma.$queryRaw`p."projectType" = ${projectType}` : prisma.$queryRaw`TRUE`)}
+        AND ${skills.length ? prisma.$queryRaw`p."skills" @> ${skills as unknown as string[]}` : prisma.$queryRaw`TRUE`}
+        AND (
+          p."search" @@ plainto_tsquery('simple', ${q})
+          OR p."title" % ${q}
+          OR p."pitch" % ${q}
+        )
+      ORDER BY ts_rank(p."search", plainto_tsquery('simple', ${q})) DESC, p."createdAt" DESC
+      OFFSET ${offset} LIMIT ${per}
+    `;
+    const idOrder = ids.map((r) => r.id);
+    if (!idOrder.length) return Response.json({ ok: true, projects: [], page, per, hasMore: false });
+    const projects = await prisma.project.findMany({ where: { id: { in: idOrder } }, include: { owner: true, roles: true } });
+    const orderMap = new Map(idOrder.map((id, idx) => [id, idx] as const));
+    projects.sort((a, b) => (orderMap.get(a.id)! - orderMap.get(b.id)!));
+    return Response.json({ ok: true, projects, page, per, hasMore: projects.length === per });
+  }
+
   const where: Record<string, unknown> = {};
   if (!showArchived) where.archived = false;
   if (projectType) where.projectType = projectType;
   if (skills.length) where.skills = { hasEvery: skills };
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { pitch: { contains: q, mode: "insensitive" } },
-    ];
-  }
 
   const list = await prisma.project.findMany({
     where,
@@ -34,24 +56,25 @@ export async function GET(req: NextRequest) {
     skip: (page - 1) * per,
     take: per,
   });
-  return Response.json({ ok: true, projects: list, page, per, hasMore: list.length === per });
+  const res = Response.json({ ok: true, projects: list, page, per, hasMore: list.length === per });
+  res.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
+  return res;
 }
 
-type NewProjectBody = { title?: string; pitch?: string; project_type?: string; skills?: string[] };
+type NewProjectBody = NewProjectInput;
 
 export async function POST(req: NextRequest) {
   const ownerId = await getOrCreateUserId();
   if (!ownerId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   let data: NewProjectBody;
   try {
-    data = await req.json();
+    data = newProjectSchema.parse(await req.json());
   } catch {
     return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
   }
-  const title = (data.title || "").trim();
-  const pitch = (data.pitch || "").trim();
+  const title = data.title.trim();
+  const pitch = data.pitch.trim();
   const skills = Array.isArray(data.skills) ? data.skills : [];
-  if (!title || !pitch) return Response.json({ ok: false, error: "title and pitch required" }, { status: 400 });
 
   // Fee gating
   const feeCfg = await getFeeConfig();
@@ -66,17 +89,30 @@ export async function POST(req: NextRequest) {
     }
   }
   const owner = await prisma.user.findUnique({ where: { id: ownerId } });
-  const project = await prisma.project.create({
-    data: {
-      ownerId,
-      title,
-      pitch,
-      projectType: data.project_type || undefined,
-      skills: skills.map((s) => String(s).trim()).filter(Boolean),
-      ownerSnapshot: owner
-        ? { handle: owner.handle, displayName: owner.displayName, avatarUrl: owner.avatarUrl }
-        : undefined,
-    },
+  const project = await prisma.$transaction(async (tx) => {
+    const created = await tx.project.create({
+      data: {
+        ownerId,
+        title,
+        pitch,
+        projectType: data.project_type || undefined,
+        skills: skills.map((s) => String(s).trim()).filter(Boolean),
+        ownerSnapshot: owner
+          ? { handle: owner.handle, displayName: owner.displayName, avatarUrl: owner.avatarUrl }
+          : undefined,
+      },
+    });
+    const roles = Array.isArray(data.roles)
+      ? data.roles
+          .map((r) => ({ skill: String(r?.skill || "").trim(), level: r?.level ? String(r.level).trim() : null, count: Number(r?.count ?? 1) }))
+          .filter((r) => !!r.skill)
+      : [];
+    if (roles.length) {
+      await tx.projectRole.createMany({
+        data: roles.map((r) => ({ projectId: created.id, skill: r.skill, level: r.level || undefined, count: Number.isFinite(r.count) ? (r.count as number) : 1 })),
+      });
+    }
+    return created;
   });
   return Response.json({ ok: true, project });
 }

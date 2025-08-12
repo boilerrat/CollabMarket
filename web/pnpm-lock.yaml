@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@farcaster/miniapp-sdk':
     specifier: ^0.1.8
-    version: 0.1.8(typescript@5.9.2)
+    version: 0.1.8(typescript@5.9.2)(zod@4.0.17)
   '@prisma/client':
     specifier: ^6.13.0
     version: 6.13.0(prisma@6.13.0)(typescript@5.9.2)
@@ -67,7 +67,10 @@ dependencies:
     version: 3.3.1
   viem:
     specifier: ^2.33.3
-    version: 2.33.3(typescript@5.9.2)
+    version: 2.33.3(typescript@5.9.2)(zod@4.0.17)
+  zod:
+    specifier: ^4.0.17
+    version: 4.0.17
 
 devDependencies:
   '@eslint/eslintrc':
@@ -250,14 +253,14 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@farcaster/miniapp-sdk@0.1.8(typescript@5.9.2):
+  /@farcaster/miniapp-sdk@0.1.8(typescript@5.9.2)(zod@4.0.17):
     resolution: {integrity: sha512-izvv3k8FdDZM0pl2lGDzr9WWuiakmjhO5h9Jz+gJ7nXsHs5JmQXBnyE9XnCpNMCifk/bVxwsN3G/XpxWMyyJzA==}
     dependencies:
       '@farcaster/miniapp-core': 0.3.7(typescript@5.9.2)
       '@farcaster/quick-auth': 0.0.6(typescript@5.9.2)
       comlink: 4.4.2
       eventemitter3: 5.0.1
-      ox: 0.4.4(typescript@5.9.2)(zod@3.25.76)
+      ox: 0.4.4(typescript@5.9.2)(zod@4.0.17)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -2011,6 +2014,21 @@ packages:
     dependencies:
       typescript: 5.9.2
       zod: 3.25.76
+    dev: false
+
+  /abitype@1.0.8(typescript@5.9.2)(zod@4.0.17):
+    resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.22.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      typescript: 5.9.2
+      zod: 4.0.17
     dev: false
 
   /acorn-jsx@5.3.2(acorn@8.15.0):
@@ -4070,7 +4088,27 @@ packages:
       - zod
     dev: false
 
-  /ox@0.8.6(typescript@5.9.2):
+  /ox@0.4.4(typescript@5.9.2)(zod@4.0.17):
+    resolution: {integrity: sha512-oJPEeCDs9iNiPs6J0rTx+Y0KGeCGyCAA3zo94yZhm8G5WpOxrwUtn2Ie/Y8IyARSqqY/j9JTKA3Fc1xs1DvFnw==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.9.6
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
+      abitype: 1.0.8(typescript@5.9.2)(zod@4.0.17)
+      eventemitter3: 5.0.1
+      typescript: 5.9.2
+    transitivePeerDependencies:
+      - zod
+    dev: false
+
+  /ox@0.8.6(typescript@5.9.2)(zod@4.0.17):
     resolution: {integrity: sha512-eiKcgiVVEGDtEpEdFi1EGoVVI48j6icXHce9nFwCNM7CKG3uoCXKdr4TPhS00Iy1TR2aWSF1ltPD0x/YgqIL9w==}
     peerDependencies:
       typescript: '>=5.4.0'
@@ -4084,7 +4122,7 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.9.2)(zod@3.25.76)
+      abitype: 1.0.8(typescript@5.9.2)(zod@4.0.17)
       eventemitter3: 5.0.1
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -4975,7 +5013,7 @@ packages:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  /viem@2.33.3(typescript@5.9.2):
+  /viem@2.33.3(typescript@5.9.2)(zod@4.0.17):
     resolution: {integrity: sha512-aWDr6i6r3OfNCs0h9IieHFhn7xQJJ8YsuA49+9T5JRyGGAkWhLgcbLq2YMecgwM7HdUZpx1vPugZjsShqNi7Gw==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -4987,9 +5025,9 @@ packages:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.9.2)(zod@3.25.76)
+      abitype: 1.0.8(typescript@5.9.2)(zod@4.0.17)
       isows: 1.0.7(ws@8.18.2)
-      ox: 0.8.6(typescript@5.9.2)
+      ox: 0.8.6(typescript@5.9.2)(zod@4.0.17)
       typescript: 5.9.2
       ws: 8.18.2
     transitivePeerDependencies:
@@ -5129,4 +5167,8 @@ packages:
 
   /zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+    dev: false
+
+  /zod@4.0.17:
+    resolution: {integrity: sha512-1PHjlYRevNxxdy2JZ8JcNAw7rX8V9P1AKkP+x/xZfxB0K5FYfuV+Ug6P/6NVSR2jHQ+FzDDoDHS04nYUsOIyLQ==}
     dev: false

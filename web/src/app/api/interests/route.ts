@@ -1,13 +1,14 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
+import { newInterestSchema } from "@/app/api/_validation";
 
 export async function POST(req: NextRequest) {
   const fromUserId = await getOrCreateUserId();
   if (!fromUserId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
   let body: { projectId?: string; message?: string };
   try {
-    body = await req.json();
+    body = newInterestSchema.parse(await req.json());
   } catch {
     return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
   }

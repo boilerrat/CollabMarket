@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
+import { updateProjectSchema, type UpdateProjectInput } from "@/app/api/_validation";
 
 export async function GET(_: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -16,17 +17,9 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   const existing = await prisma.project.findUnique({ where: { id } });
   if (!existing) return Response.json({ ok: false, error: "not found" }, { status: 404 });
   if (existing.ownerId !== ownerId) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
-  let body: Partial<{
-    title: string;
-    pitch: string;
-    skills: string[];
-    projectType: string;
-    status: string;
-    archived: boolean;
-    roles: Array<{ id?: string; skill: string; level?: string | null; count?: number | null }>;
-  }> = {};
+  let body: UpdateProjectInput = {} as UpdateProjectInput;
   try {
-    body = await req.json();
+    body = updateProjectSchema.parse(await req.json());
   } catch {}
   const data: Record<string, unknown> = {};
   if (typeof body.title === "string") data.title = body.title;

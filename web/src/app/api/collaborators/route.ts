@@ -46,7 +46,9 @@ export async function GET(req: NextRequest) {
     project_types: p.projectTypes || [],
   }));
 
-  return Response.json({ ok: true, collaborators, page, per, hasMore: list.length === per });
+  const res = Response.json({ ok: true, collaborators, page, per, hasMore: list.length === per });
+  res.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
+  return res;
 }
 
 

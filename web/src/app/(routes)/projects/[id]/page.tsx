@@ -15,6 +15,7 @@ type Project = {
   projectType?: string;
   skills: string[];
   owner?: { handle?: string | null; displayName?: string | null };
+  roles?: Array<{ id: string; skill: string; level?: string | null; count: number }>;
 };
 
 export default function ProjectDetailsPage() {
@@ -26,6 +27,7 @@ export default function ProjectDetailsPage() {
   const [editTitle, setEditTitle] = useState("");
   const [editPitch, setEditPitch] = useState("");
   const [archiving, setArchiving] = useState(false);
+  const [editRoles, setEditRoles] = useState<Array<{ id?: string; skill: string; level?: string | null; count?: number | null }>>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -35,6 +37,7 @@ export default function ProjectDetailsPage() {
         setProject(data.project);
         setEditTitle(data.project.title);
         setEditPitch(data.project.pitch);
+        setEditRoles((data.project.roles || []).map((r: { id: string; skill: string; level?: string | null; count?: number | null }) => ({ id: r.id, skill: r.skill, level: r.level || "", count: r.count || 1 })));
       }
       const me = await fetch('/api/me');
       const meData = await me.json();
@@ -79,6 +82,16 @@ export default function ProjectDetailsPage() {
             {project.skills?.length ? (
               <p className="text-sm">Skills: {project.skills.join(", ")}</p>
             ) : null}
+            {project.roles?.length ? (
+              <div className="text-sm">
+                <p className="font-medium mb-1">Roles</p>
+                <ul className="list-disc pl-5 space-y-0.5">
+                  {project.roles.map((r) => (
+                    <li key={r.id}>{r.skill}{r.level ? ` (${r.level})` : ""}{r.count && r.count > 1 ? ` ×${r.count}` : ""}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <div className="grid gap-2">
               <label htmlFor="msg" className="text-sm font-medium">Message (optional)</label>
               <Textarea id="msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
@@ -99,7 +112,7 @@ export default function ProjectDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={async () => {
-                      const res = await fetch(`/api/projects/${project.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ title: editTitle, pitch: editPitch }) });
+                      const res = await fetch(`/api/projects/${project.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ title: editTitle, pitch: editPitch, roles: editRoles }) });
                       if (res.ok) {
                         toast.success('Project updated');
                         router.refresh();
@@ -127,6 +140,24 @@ export default function ProjectDetailsPage() {
                   >
                     Archive Project
                   </Button>
+                </div>
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium">Edit Roles</p>
+                  <div className="space-y-2">
+                    {editRoles.map((r, idx) => (
+                      <div key={idx} className="grid grid-cols-6 gap-2">
+                        <Input placeholder="Skill" value={r.skill} onChange={(e) => setEditRoles((arr) => arr.map((x, i) => i===idx ? { ...x, skill: e.target.value } : x))} className="col-span-3" />
+                        <Input placeholder="Level" value={r.level || ""} onChange={(e) => setEditRoles((arr) => arr.map((x, i) => i===idx ? { ...x, level: e.target.value } : x))} className="col-span-2" />
+                        <Input placeholder="Count" type="number" min={1} value={r.count ?? 1} onChange={(e) => setEditRoles((arr) => arr.map((x, i) => i===idx ? { ...x, count: Number(e.target.value) } : x))} />
+                      </div>
+                    ))}
+                    <div className="flex gap-2">
+                      <Button type="button" variant="secondary" onClick={() => setEditRoles((arr) => [...arr, { skill: "", level: "", count: 1 }])}>Add Role</Button>
+                      {editRoles.length > 0 ? (
+                        <Button type="button" variant="outline" onClick={() => setEditRoles((arr) => arr.slice(0, -1))}>Remove Last</Button>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : null}

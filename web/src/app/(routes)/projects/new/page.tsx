@@ -16,6 +16,7 @@ export default function NewProjectPage() {
   const [pitch, setPitch] = useState("");
   const [projectType, setProjectType] = useState("");
   const [skillsList, setSkillsList] = useState<string[]>([]);
+  const [roles, setRoles] = useState<Array<{ skill: string; level?: string; count?: number }>>([{ skill: "", level: "", count: 1 }]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [feeCfg, setFeeCfg] = useState<{ enabled: boolean; price: string; token: string | null; chainId: number | null } | null>(null);
@@ -62,6 +63,7 @@ export default function NewProjectPage() {
           pitch,
           project_type: projectType,
           skills: skillsList,
+          roles: roles.filter((r) => r.skill.trim()).map((r) => ({ skill: r.skill.trim(), level: r.level?.trim() || undefined, count: Number(r.count || 1) })),
         }),
       });
       const data = await res.json();
@@ -70,6 +72,7 @@ export default function NewProjectPage() {
       setPitch("");
       setProjectType("");
       setSkillsList([]);
+      setRoles([{ skill: "", level: "", count: 1 }]);
       toast.success("Project created");
       router.push("/projects");
     } catch (err) {
@@ -105,6 +108,24 @@ export default function NewProjectPage() {
             <div className="grid gap-2">
               <Label>Required Skills</Label>
               <SkillsMultiSelect selected={skillsList} onChange={setSkillsList} options={["React","Next.js","TypeScript","Tailwind","Design","Solidity","Python"]} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Roles (optional)</Label>
+              <div className="space-y-2">
+                {roles.map((r, idx) => (
+                  <div key={idx} className="grid grid-cols-6 gap-2">
+                    <Input placeholder="Skill" value={r.skill} onChange={(e) => setRoles((arr) => arr.map((x, i) => i===idx ? { ...x, skill: e.target.value } : x))} className="col-span-3" />
+                    <Input placeholder="Level" value={r.level || ""} onChange={(e) => setRoles((arr) => arr.map((x, i) => i===idx ? { ...x, level: e.target.value } : x))} className="col-span-2" />
+                    <Input placeholder="Count" type="number" min={1} value={r.count ?? 1} onChange={(e) => setRoles((arr) => arr.map((x, i) => i===idx ? { ...x, count: Number(e.target.value) } : x))} />
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <Button type="button" variant="secondary" onClick={() => setRoles((arr) => [...arr, { skill: "", level: "", count: 1 }])}>Add Role</Button>
+                  {roles.length > 1 ? (
+                    <Button type="button" variant="outline" onClick={() => setRoles((arr) => arr.slice(0, -1))}>Remove Last</Button>
+                  ) : null}
+                </div>
+              </div>
             </div>
             {feeCfg?.enabled ? (
               <div className="grid gap-2">
