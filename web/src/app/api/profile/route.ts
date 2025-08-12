@@ -3,10 +3,12 @@ import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
 import { profileUpsertSchema } from "@/app/api/_validation";
+import { okJson, errorJson } from "@/app/api/_responses";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   const userId = await getOrCreateUserId();
-  if (!userId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  if (!userId) return errorJson("unauthorized", 401);
   const profile = await prisma.collaboratorProfile.findFirst({ where: { userId } });
   return Response.json({ ok: true, profile });
 }
@@ -19,10 +21,10 @@ export async function POST(req: NextRequest) {
   try {
     data = await req.json();
   } catch {
-    return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
+    return errorJson("invalid json", 400, "invalid_input");
   }
   const parsed = profileUpsertSchema.safeParse(data);
-  if (!parsed.success) return Response.json({ ok: false, error: "invalid input" }, { status: 400 });
+  if (!parsed.success) return errorJson("invalid input", 400, "invalid_input");
 
   const display_name = String(parsed.data?.display_name || "").trim();
   const handle = String(parsed.data?.handle || "").trim();
@@ -62,7 +64,7 @@ export async function POST(req: NextRequest) {
     const feeCfg = await getFeeConfig();
     if (feeCfg.enabled) {
       const paymentTx = (new URL(req.url).searchParams.get("payment_tx") || "").trim();
-      if (!paymentTx) return Response.json({ ok: false, error: "payment_tx required" }, { status: 402 });
+      if (!paymentTx) return errorJson("payment_tx required", 402, "payment_required");
       await verifyAndRecordPayment({ txHash: paymentTx, expectedAction: "profile", userId });
     }
 
@@ -89,10 +91,11 @@ export async function POST(req: NextRequest) {
             links: links && links.length ? links : undefined,
           },
         });
-    return Response.json({ ok: true, profile });
+    revalidatePath("/collaborators");
+    return okJson({ profile });
   } catch (err) {
     const message = err instanceof Error ? err.message : "failed";
-    return Response.json({ ok: false, error: message }, { status: 500 });
+    return errorJson(message, 500);
   }
 }
 

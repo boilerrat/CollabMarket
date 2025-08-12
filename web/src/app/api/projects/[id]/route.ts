@@ -2,21 +2,23 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 import { updateProjectSchema, type UpdateProjectInput } from "@/app/api/_validation";
+import { okJson, errorJson } from "@/app/api/_responses";
+import { revalidatePath } from "next/cache";
 
 export async function GET(_: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const project = await prisma.project.findUnique({ where: { id }, include: { owner: true, roles: true } });
-  if (!project) return Response.json({ ok: false, error: "not found" }, { status: 404 });
-  return Response.json({ ok: true, project });
+  if (!project) return errorJson("not found", 404);
+  return okJson({ project });
 }
 
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const ownerId = await getOrCreateUserId();
-  if (!ownerId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  if (!ownerId) return errorJson("unauthorized", 401);
   const { id } = await context.params;
   const existing = await prisma.project.findUnique({ where: { id } });
-  if (!existing) return Response.json({ ok: false, error: "not found" }, { status: 404 });
-  if (existing.ownerId !== ownerId) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
+  if (!existing) return errorJson("not found", 404);
+  if (existing.ownerId !== ownerId) return errorJson("forbidden", 403);
   let body: UpdateProjectInput = {} as UpdateProjectInput;
   try {
     body = updateProjectSchema.parse(await req.json());
@@ -49,7 +51,9 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     }
     return updated;
   });
-  return Response.json({ ok: true, project });
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+  return okJson({ project });
 }
 
 

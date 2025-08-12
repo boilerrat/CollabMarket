@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { createHmac } from "crypto";
 import { prisma } from "@/server/db";
-import { verifyQuickAuthToken } from "@/server/auth";
+import { verifyQuickAuthToken, getSessionSecret } from "@/server/auth";
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization") || req.headers.get("Authorization");
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       create: { id: userId, fid: claims.fid, handle: claims.username || undefined, displayName: claims.displayName || undefined, avatarUrl: claims.pfpUrl || undefined },
     });
   }
-  const secret = process.env.SESSION_SECRET || "dev-secret-not-for-prod";
+  const secret = getSessionSecret();
   const sig = createHmac("sha256", secret).update(token).digest("hex");
   const value = `${token}.${sig}`;
   const cookieStore = await cookies();

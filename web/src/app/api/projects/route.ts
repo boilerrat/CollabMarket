@@ -3,6 +3,8 @@ import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 import { getFeeConfig, verifyAndRecordPayment } from "@/app/api/utils/fees";
 import { newProjectSchema, type NewProjectInput } from "@/app/api/_validation";
+import { okJson, errorJson } from "@/app/api/_responses";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -56,7 +58,7 @@ export async function GET(req: NextRequest) {
     skip: (page - 1) * per,
     take: per,
   });
-  const res = Response.json({ ok: true, projects: list, page, per, hasMore: list.length === per });
+  const res = okJson({ projects: list, page, per, hasMore: list.length === per });
   res.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
   return res;
 }
@@ -65,12 +67,12 @@ type NewProjectBody = NewProjectInput;
 
 export async function POST(req: NextRequest) {
   const ownerId = await getOrCreateUserId();
-  if (!ownerId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  if (!ownerId) return errorJson("unauthorized", 401);
   let data: NewProjectBody;
   try {
     data = newProjectSchema.parse(await req.json());
   } catch {
-    return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
+    return errorJson("invalid json", 400, "invalid_input");
   }
   const title = data.title.trim();
   const pitch = data.pitch.trim();
@@ -85,7 +87,7 @@ export async function POST(req: NextRequest) {
       await verifyAndRecordPayment({ txHash: paymentTx, expectedAction: "project", userId: ownerId });
     } catch (e) {
       const message = e instanceof Error ? e.message : "payment verification failed";
-      return Response.json({ ok: false, error: message }, { status: 402 });
+      return errorJson(message, 402, "payment_required");
     }
   }
   const owner = await prisma.user.findUnique({ where: { id: ownerId } });
@@ -114,7 +116,8 @@ export async function POST(req: NextRequest) {
     }
     return created;
   });
-  return Response.json({ ok: true, project });
+  revalidatePath("/projects");
+  return okJson({ project });
 }
 
 

@@ -28,16 +28,18 @@ export default function ProjectsPage() {
   const per = 10;
 
   const load = async () => {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (skills.length) params.set("skills", skills.join(","));
-    if (type) params.set("type", type);
-    if (showArchived) params.set("archived", "1");
-    params.set("page", String(page));
-    params.set("per", String(per));
-    const res = await fetch(`/api/projects?${params.toString()}`);
-    const data = await res.json();
-    if (res.ok) setProjects(data.projects || []);
+    try {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (skills.length) params.set("skills", skills.join(","));
+      if (type) params.set("type", type);
+      if (showArchived) params.set("archived", "1");
+      params.set("page", String(page));
+      params.set("per", String(per));
+      const res = await fetch(`/api/projects?${params.toString()}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) setProjects(data.projects || []);
+    } catch {}
   };
 
   useEffect(() => {

@@ -56,7 +56,7 @@ export async function getSessionToken(): Promise<string | null> {
   if (!raw) return null;
   const [token, sig] = raw.split(".");
   if (!token || !sig) return null;
-  const secret = process.env.SESSION_SECRET || "dev-secret-not-for-prod";
+  const secret = getSessionSecret();
   const expected = createHmac("sha256", secret).update(token).digest("hex");
   if (expected !== sig) return null;
   return token;
@@ -112,6 +112,22 @@ export async function getOrCreateUserId(): Promise<string | null> {
   const id = deriveUserIdFromToken(token);
   await prisma.user.upsert({ where: { id }, update: {}, create: { id } });
   return id;
+}
+
+/**
+ * Returns the session secret. In production, this must be explicitly configured
+ * via SESSION_SECRET and must not equal the development placeholder.
+ */
+export function getSessionSecret(): string {
+  const envSecret = process.env.SESSION_SECRET || "";
+  const isProd = process.env.NODE_ENV === "production";
+  if (isProd) {
+    if (!envSecret || envSecret === "dev-secret-not-for-prod") {
+      throw new Error("SESSION_SECRET must be set in production");
+    }
+    return envSecret;
+  }
+  return envSecret || "dev-secret-not-for-prod";
 }
 
 

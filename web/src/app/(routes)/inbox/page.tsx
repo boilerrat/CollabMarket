@@ -17,9 +17,11 @@ export default function InboxPage() {
   const [inbox, setInbox] = useState<InboxItem[]>([]);
 
   const load = async () => {
-    const res = await fetch("/api/inbox");
-    const data = await res.json();
-    if (res.ok) setInbox(data.inbox || []);
+    try {
+      const res = await fetch("/api/inbox", { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) setInbox(data.inbox || []);
+    } catch {}
   };
 
   useEffect(() => {

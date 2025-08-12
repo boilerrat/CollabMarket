@@ -27,18 +27,20 @@ export default function CollaboratorsPage() {
   const per = 10;
 
   const load = async () => {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (skills.length) params.set("skills", skills.join(","));
-    if (type) params.set("type", type);
-    params.set("page", String(page));
-    params.set("per", String(per));
-    const res = await fetch(`/api/collaborators?${params.toString()}`, { cache: "no-store" });
-    const data = await res.json();
-    if (res.ok) {
-      setProfiles(data.collaborators || []);
-      setHasMore(Boolean(data.hasMore));
-    }
+    try {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (skills.length) params.set("skills", skills.join(","));
+      if (type) params.set("type", type);
+      params.set("page", String(page));
+      params.set("per", String(per));
+      const res = await fetch(`/api/collaborators?${params.toString()}`, { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setProfiles(data.collaborators || []);
+        setHasMore(Boolean(data.hasMore));
+      }
+    } catch {}
   };
 
   useEffect(() => {
