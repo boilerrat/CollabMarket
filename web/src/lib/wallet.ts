@@ -3,8 +3,9 @@
 import { encodeFunctionData, parseAbi } from "viem";
 import { sdk } from "@farcaster/miniapp-sdk";
 
+type Eip1193RequestArgs = { method: string; params?: unknown[] | Record<string, unknown> };
 type Eip1193Provider = {
-  request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<any>;
+  request: <TResponse = unknown>(args: Eip1193RequestArgs) => Promise<TResponse>;
 };
 
 const erc20Abi = parseAbi([
@@ -43,10 +44,12 @@ async function getFirstAccount(provider: Eip1193Provider): Promise<string> {
   return accounts[0];
 }
 
+type TransactionReceipt = { status?: string | boolean | null } | null;
+
 async function waitForReceipt(provider: Eip1193Provider, txHash: string, timeoutMs = 60000): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    const receipt = await provider.request({ method: "eth_getTransactionReceipt", params: [txHash] });
+    const receipt = await provider.request<TransactionReceipt>({ method: "eth_getTransactionReceipt", params: [txHash] });
     if (receipt && receipt.status) return; // any status indicates mined (0x1 success, 0x0 failure)
     await new Promise((r) => setTimeout(r, 1500));
   }

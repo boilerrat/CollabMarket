@@ -1,4 +1,4 @@
-import { createPublicClient, http, type Address, type Hash, parseAbi, decodeEventLog, getAddress } from "viem";
+import { createPublicClient, http, type Address, type Hash, parseAbi, decodeEventLog, getAddress, type Chain, type PublicClient } from "viem";
 
 // Environment configuration
 const RPC_URL = process.env.CHAIN_RPC_URL || "";
@@ -6,13 +6,22 @@ const CHAIN_ID = Number(process.env.CHAIN_ID || 84532); // default to Base Sepol
 const POSTING_FEE_CONTRACT = (process.env.POSTING_FEE_CONTRACT || "").toLowerCase();
 const USDC_CONTRACT = (process.env.USDC_CONTRACT || "").toLowerCase();
 
-if (!RPC_URL) console.warn("CHAIN_RPC_URL is not set; on-chain verification will fail.");
-if (!POSTING_FEE_CONTRACT) console.warn("POSTING_FEE_CONTRACT is not set; fee gating will be disabled.");
+// Avoid throwing during build: do not construct a client until used
 
-export const publicClient = createPublicClient({
-  transport: http(RPC_URL),
-  chain: undefined as any, // viem can still operate with transport-only for basic methods
-});
+// Minimal chain object to satisfy typing without bringing a full network preset
+const minimalChain: Chain = {
+  id: CHAIN_ID,
+  name: `custom-${CHAIN_ID}`,
+  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  rpcUrls: { default: { http: [RPC_URL || "http://localhost"] }, public: { http: [RPC_URL || "http://localhost"] } },
+};
+
+function getPublicClient(): PublicClient {
+  if (!RPC_URL) {
+    throw new Error("CHAIN_RPC_URL not configured");
+  }
+  return createPublicClient({ transport: http(RPC_URL), chain: minimalChain });
+}
 
 // ABI for PostingFee contract (subset required for verification)
 export const postingFeeAbi = parseAbi([
@@ -35,9 +44,9 @@ export type VerifiedPayment = {
 };
 
 export async function areFeesEnabled(): Promise<boolean> {
-  if (!POSTING_FEE_CONTRACT) return false;
+  if (!POSTING_FEE_CONTRACT || !RPC_URL) return false;
   try {
-    const enabled = await publicClient.readContract({
+    const enabled = await getPublicClient().readContract({
       address: POSTING_FEE_CONTRACT as Address,
       abi: postingFeeAbi,
       functionName: "feesEnabled",
@@ -51,11 +60,11 @@ export async function areFeesEnabled(): Promise<boolean> {
 export async function readFeeConfig(): Promise<{ postPrice: bigint | null; feesEnabled: boolean; postingFeeContract: string; usdcContract: string; chainId: number }>{
   let postPrice: bigint | null = null;
   let enabled = false;
-  if (POSTING_FEE_CONTRACT) {
+  if (POSTING_FEE_CONTRACT && RPC_URL) {
     try {
       const [price, isEnabled] = await Promise.all([
-        publicClient.readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "postPrice" }),
-        publicClient.readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "feesEnabled" }),
+        getPublicClient().readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "postPrice" }),
+        getPublicClient().readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "feesEnabled" }),
       ]);
       postPrice = BigInt(price as unknown as string);
       enabled = Boolean(isEnabled);
@@ -66,10 +75,12 @@ export async function readFeeConfig(): Promise<{ postPrice: bigint | null; feesE
 
 export async function verifyPostingFeePayment(params: { txHash: string; expectedAction: PostingAction }): Promise<VerifiedPayment> {
   if (!POSTING_FEE_CONTRACT) throw new Error("fee contract not configured");
+  if (!RPC_URL) throw new Error("rpc not configured");
   const txHash = params.txHash as Hash;
   const expectedAction = params.expectedAction;
 
-  const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+  const client = getPublicClient();
+  const receipt = await client.getTransactionReceipt({ hash: txHash });
   if (receipt.status !== "success") throw new Error("transaction not successful");
 
   // Find FeePaid event in logs for the configured contract
@@ -87,19 +98,19 @@ export async function verifyPostingFeePayment(params: { txHash: string; expected
   const payer = getAddress(decoded.payer);
   const action = decoded.action;
   if (action !== expectedAction) throw new Error("payment action mismatch");
-  if (!decoded.amount || decoded.amount <= 0n) throw new Error("invalid payment amount");
+  if (!decoded.amount || decoded.amount <= BigInt(0)) throw new Error("invalid payment amount");
 
   // Optional: verify the contract is configured with expected USDC address
   if (USDC_CONTRACT) {
     try {
-      const usdc = await publicClient.readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "usdc" });
+      const usdc = await client.readContract({ address: POSTING_FEE_CONTRACT as Address, abi: postingFeeAbi, functionName: "usdc" });
       if ((usdc as Address).toLowerCase() !== USDC_CONTRACT) throw new Error("unexpected USDC token");
     } catch (e) {
       throw new Error("failed to validate token");
     }
   }
 
-  const block = await publicClient.getBlock({ blockNumber: receipt.blockNumber });
+  const block = await client.getBlock({ blockNumber: receipt.blockNumber });
   const blockTime = new Date(Number(block.timestamp) * 1000);
 
   return {

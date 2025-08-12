@@ -35,6 +35,8 @@ model CollaboratorProfile {
   skills                 String[]
   projectTypes           String[]
   availabilityHoursWeek  Int?
+  // Optional list of profile/public links (e.g., GitHub, website). Stored as JSON for flexibility
+  links                  Json?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 }
@@ -52,6 +54,9 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   interests   Interest[]
+  roles       ProjectRole[]
+  // Snapshot of owner metadata at post time (handle, displayName, avatarUrl)
+  ownerSnapshot Json?
 }
 
 model Interest {
@@ -77,4 +82,16 @@ model Payment {
   userId       String?
   user         User?    @relation(fields: [userId], references: [id])
   createdAt    DateTime @default(now())
+}
+
+model ProjectRole {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  // Skill/role name being requested (e.g., "designer", "solidity", "pm")
+  skill     String
+  // Optional seniority/level (e.g., "junior", "mid", "senior")
+  level     String?
+  // Number of openings for this role
+  count     Int     @default(1)
 }

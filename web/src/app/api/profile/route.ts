@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     skills?: string[] | string;
     project_types?: string[] | string;
     availability_hours_week?: number | string;
+    links?: Array<{ label?: string; url: string }> | string;
   };
   try {
     data = await req.json();
@@ -44,6 +45,18 @@ export async function POST(req: NextRequest) {
         .map((s) => s.trim())
         .filter(Boolean);
   const availability_hours_week = Number(data?.availability_hours_week);
+  // Parse links: accept array of objects or comma-separated URLs
+  let links: Array<{ label?: string; url: string }> | undefined;
+  if (Array.isArray(data?.links)) {
+    links = data.links
+      .map((l) => ({ label: l?.label ? String(l.label).trim() : undefined, url: String(l?.url || "").trim() }))
+      .filter((l) => !!l.url);
+  } else if (typeof data?.links === "string" && data.links.trim().length) {
+    links = String(data.links)
+      .split(",")
+      .map((u) => ({ url: u.trim() }))
+      .filter((l) => !!l.url);
+  }
 
   if (!display_name || !handle) {
     return Response.json({ ok: false, error: "display_name and handle are required" }, { status: 400 });
@@ -68,6 +81,7 @@ export async function POST(req: NextRequest) {
             skills,
             projectTypes: project_types,
             availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
+            links: links && links.length ? links : undefined,
           },
         })
       : await prisma.collaboratorProfile.create({
@@ -77,6 +91,7 @@ export async function POST(req: NextRequest) {
             skills,
             projectTypes: project_types,
             availabilityHoursWeek: Number.isFinite(availability_hours_week) ? availability_hours_week : null,
+            links: links && links.length ? links : undefined,
           },
         });
     return Response.json({ ok: true, profile });

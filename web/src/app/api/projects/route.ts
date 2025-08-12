@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const list = await prisma.project.findMany({
     where,
     orderBy: { createdAt: "desc" },
-    include: { owner: true },
+    include: { owner: true, roles: true },
     skip: (page - 1) * per,
     take: per,
   });
@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: false, error: message }, { status: 402 });
     }
   }
+  const owner = await prisma.user.findUnique({ where: { id: ownerId } });
   const project = await prisma.project.create({
     data: {
       ownerId,
@@ -72,6 +73,9 @@ export async function POST(req: NextRequest) {
       pitch,
       projectType: data.project_type || undefined,
       skills: skills.map((s) => String(s).trim()).filter(Boolean),
+      ownerSnapshot: owner
+        ? { handle: owner.handle, displayName: owner.displayName, avatarUrl: owner.avatarUrl }
+        : undefined,
     },
   });
   return Response.json({ ok: true, project });
