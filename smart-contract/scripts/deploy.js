@@ -38,9 +38,15 @@ async function main() {
   }
 
   if (!usdcAddress && isBase) {
-    throw new Error(
-      "USDC_ADDRESS is required for Base/Base Sepolia deployments. Set USDC_ADDRESS in .env"
-    );
+    // Default to canonical USDC on Base mainnet if no env provided and deploying to base
+    if (net === "base") {
+      usdcAddress = "0x833589fCD6EDB6E08f4c7c32D4f71B54Bda02913";
+      console.log("Using default Base USDC:", usdcAddress);
+    } else if (net === "baseSepolia") {
+      throw new Error(
+        "USDC_ADDRESS is required for Base Sepolia deployments. Set USDC_ADDRESS in .env"
+      );
+    }
   }
 
   if (!usdcAddress) {
