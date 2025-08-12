@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { sdk } from "@farcaster/miniapp-sdk";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
 import { payPostingFeeWithFarcasterWallet } from "@/lib/wallet";
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/ui/page-header";
 
 type ProfileForm = {
   display_name: string;
@@ -20,6 +22,7 @@ type ProfileForm = {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [form, setForm] = useState<ProfileForm>({
     display_name: "",
     handle: "",
@@ -109,11 +112,9 @@ export default function ProfilePage() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-2xl">
+        <PageHeader title="Your Profile" description="Fill details for collaborator directory." backFallbackHref="/collaborators" />
         <Card>
-          <CardHeader>
-            <CardTitle>Your Profile</CardTitle>
-            <CardDescription>Fill details for collaborator directory.</CardDescription>
-          </CardHeader>
+          <CardHeader className="pb-0" />
           <CardContent className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="display_name">Display Name</Label>
@@ -172,6 +173,7 @@ export default function ProfilePage() {
             ) : null}
             <div className="flex gap-2">
               <Button onClick={onSubmit} disabled={saving}>{saving ? "Saving..." : "Save Profile"}</Button>
+              <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
             </div>
             {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
           </CardContent>

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 
 type Profile = {
   userKey: string;
@@ -24,10 +26,14 @@ export default function CollaboratorsPage() {
   const [type, setType] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const per = 10;
 
   const load = async () => {
     try {
+      setIsLoading(true);
+      setLoadError(null);
       const params = new URLSearchParams();
       if (q) params.set("q", q);
       if (skills.length) params.set("skills", skills.join(","));
@@ -39,8 +45,14 @@ export default function CollaboratorsPage() {
       if (res.ok) {
         setProfiles(data.collaborators || []);
         setHasMore(Boolean(data.hasMore));
+      } else {
+        setLoadError(data?.error || "Failed to load collaborators");
       }
-    } catch {}
+    } catch (err: any) {
+      setLoadError(err?.message || "Failed to load collaborators");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -51,23 +63,25 @@ export default function CollaboratorsPage() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-4xl space-y-4">
+        <PageHeader title="Collaborators" description="Explore profiles and connect with builders." backFallbackHref="/" action={<Button asChild><Link href="/profile">Create/Update Profile</Link></Button>} />
         <div className="flex flex-wrap items-center gap-2">
-          <Input placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="w-full sm:w-64 md:flex-1" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
           <SkillsMultiSelect
             selected={skills}
             onChange={setSkills}
             options={["React","Next.js","TypeScript","Tailwind","Design","Solidity","Python"]}
             placeholder="Filter skills"
           />
-          <Input placeholder="Project Type" value={type} onChange={(e) => setType(e.target.value)} />
-          <Button onClick={() => { setPage(1); load(); }}>Filter</Button>
-          <Button asChild>
-            <Link href="/profile">Create/Update Profile</Link>
-          </Button>
+          <Input className="w-full sm:w-40" placeholder="Project Type" value={type} onChange={(e) => setType(e.target.value)} />
+          <Button disabled={isLoading} onClick={() => { setPage(1); load(); }}>{isLoading ? "Loading..." : "Filter"}</Button>
+          
         </div>
+        {loadError ? (
+          <div className="rounded-md border bg-destructive/10 text-destructive p-3 text-sm">{loadError}</div>
+        ) : null}
         <div className="grid gap-3">
           {profiles.map((p) => (
-            <Card key={p.userKey}>
+            <Card key={p.userKey} className="transition-shadow hover:shadow-sm">
               <CardHeader>
                 <CardTitle>{p.display_name}</CardTitle>
                 <CardDescription>@{p.handle}</CardDescription>
@@ -100,7 +114,17 @@ export default function CollaboratorsPage() {
               </CardContent>
             </Card>
           ))}
-          {!profiles.length ? <p className="text-sm text-muted-foreground">No collaborators yet.</p> : null}
+          {!profiles.length && !isLoading ? (
+            <EmptyState
+              title="No collaborators found"
+              description="Try adjusting your search or skills filters, or invite friends to join."
+              action={(
+                <Button asChild size="sm">
+                  <a href={`https://warpcast.com/~/compose?text=${encodeURIComponent("Come join CollabMarket to find collaborators!")}`} target="_blank" rel="noopener noreferrer">Invite on Farcaster</a>
+                </Button>
+              )}
+            />
+          ) : null}
         </div>
         <div className="flex items-center justify-between pt-2">
           <Button

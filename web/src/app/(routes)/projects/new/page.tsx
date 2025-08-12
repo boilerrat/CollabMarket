@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
+import { PageHeader } from "@/components/ui/page-header";
 import { payPostingFeeWithFarcasterWallet } from "@/lib/wallet";
 
 export default function NewProjectPage() {
@@ -87,11 +88,9 @@ export default function NewProjectPage() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-2xl">
+        <PageHeader title="New Project" description="Describe your project and required skills." backFallbackHref="/projects" />
         <Card>
-          <CardHeader>
-            <CardTitle>New Project</CardTitle>
-            <CardDescription>Describe your project and required skills.</CardDescription>
-          </CardHeader>
+          <CardHeader className="pb-0" />
           <CardContent className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>

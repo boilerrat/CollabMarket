@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/ui/page-header";
 
 type Project = {
   id: string;
@@ -28,23 +29,41 @@ export default function ProjectDetailsPage() {
   const [editPitch, setEditPitch] = useState("");
   const [archiving, setArchiving] = useState(false);
   const [editRoles, setEditRoles] = useState<Array<{ id?: string; skill: string; level?: string | null; count?: number | null }>>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch(`/api/projects/${params.id}`);
-      const data = await res.json();
-      if (res.ok) {
-        setProject(data.project);
-        setEditTitle(data.project.title);
-        setEditPitch(data.project.pitch);
-        setEditRoles((data.project.roles || []).map((r: { id: string; skill: string; level?: string | null; count?: number | null }) => ({ id: r.id, skill: r.skill, level: r.level || "", count: r.count || 1 })));
+      try {
+        setLoadError(null);
+        const res = await fetch(`/api/projects/${params.id}`, { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok) {
+          setProject(data.project);
+          setEditTitle(data.project.title);
+          setEditPitch(data.project.pitch);
+          setEditRoles((data.project.roles || []).map((r: { id: string; skill: string; level?: string | null; count?: number | null }) => ({ id: r.id, skill: r.skill, level: r.level || "", count: r.count || 1 })));
+        } else {
+          setLoadError(data?.error || "Failed to load project");
+        }
+        const me = await fetch('/api/me', { cache: "no-store" });
+        const meData = await me.json();
+        if (me.ok && meData?.user?.id && data?.project?.ownerId) setIsOwner(meData.user.id === data.project.ownerId);
+      } catch (err: any) {
+        setLoadError(err?.message || "Failed to load project");
       }
-      const me = await fetch('/api/me');
-      const meData = await me.json();
-      if (me.ok && meData?.user?.id && data?.project?.ownerId) setIsOwner(meData.user.id === data.project.ownerId);
     };
     load();
   }, [params.id]);
+
+  if (loadError) {
+    return (
+      <main className="p-4">
+        <div className="mx-auto max-w-2xl">
+          <div className="rounded-md border bg-destructive/10 text-destructive p-4 text-sm">{loadError}</div>
+        </div>
+      </main>
+    );
+  }
 
   if (!project) return null;
 
@@ -67,6 +86,7 @@ export default function ProjectDetailsPage() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-2xl">
+        <PageHeader backFallbackHref="/projects" />
         <Card>
           <CardHeader>
             <CardTitle>{project.title}</CardTitle>
@@ -96,7 +116,10 @@ export default function ProjectDetailsPage() {
               <label htmlFor="msg" className="text-sm font-medium">Message (optional)</label>
               <Textarea id="msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
-            <Button onClick={sendInterest}>I’m interested</Button>
+            <div className="flex gap-2">
+              <Button onClick={sendInterest}>I’m interested</Button>
+              <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
+            </div>
             {isOwner ? (
               <div className="mt-6 space-y-3 border-t pt-4">
                 <p className="text-sm font-medium">Owner actions</p>
@@ -122,6 +145,17 @@ export default function ProjectDetailsPage() {
                     }}
                   >
                     Save Changes
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setEditTitle(project.title);
+                      setEditPitch(project.pitch);
+                      setEditRoles((project.roles || []).map((r) => ({ id: r.id, skill: r.skill, level: r.level || "", count: r.count || 1 })));
+                    }}
+                  >
+                    Cancel
                   </Button>
                   <Button
                     variant="destructive"

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 
 type Project = {
   id: string;
@@ -20,6 +22,8 @@ type Project = {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [type, setType] = useState("");
@@ -29,6 +33,8 @@ export default function ProjectsPage() {
 
   const load = async () => {
     try {
+      setIsLoading(true);
+      setLoadError(null);
       const params = new URLSearchParams();
       if (q) params.set("q", q);
       if (skills.length) params.set("skills", skills.join(","));
@@ -36,10 +42,15 @@ export default function ProjectsPage() {
       if (showArchived) params.set("archived", "1");
       params.set("page", String(page));
       params.set("per", String(per));
-      const res = await fetch(`/api/projects?${params.toString()}`);
+      const res = await fetch(`/api/projects?${params.toString()}`, { cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (res.ok) setProjects(data.projects || []);
-    } catch {}
+      else setLoadError(data?.error || "Failed to load projects");
+    } catch (err: any) {
+      setLoadError(err?.message || "Failed to load projects");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -50,22 +61,24 @@ export default function ProjectsPage() {
   return (
     <main className="p-4">
       <div className="mx-auto max-w-4xl space-y-4">
+        <PageHeader title="Projects" description="Discover projects and find collaborators." backFallbackHref="/" action={<Button asChild><Link href="/projects/new">New Project</Link></Button>} />
         <div className="flex flex-wrap items-center gap-2">
-          <Input placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="w-full sm:w-64 md:flex-1" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} />
           <SkillsMultiSelect selected={skills} onChange={setSkills} options={["React","Next.js","TypeScript","Tailwind","Design","Solidity","Python"]} placeholder="Filter skills" />
-          <Input placeholder="Project Type" value={type} onChange={(e) => setType(e.target.value)} />
-          <Button onClick={() => { setPage(1); load(); }}>Filter</Button>
+          <Input className="w-full sm:w-40" placeholder="Project Type" value={type} onChange={(e) => setType(e.target.value)} />
+          <Button disabled={isLoading} onClick={() => { setPage(1); load(); }}>{isLoading ? "Loading..." : "Filter"}</Button>
           <label className="text-sm flex items-center gap-2 ml-auto">
             <input type="checkbox" checked={showArchived} onChange={(e) => { setShowArchived(e.target.checked); setPage(1); }} />
             Show archived
           </label>
-          <Button asChild>
-            <Link href="/projects/new">New Project</Link>
-          </Button>
+          
         </div>
+        {loadError ? (
+          <div className="rounded-md border bg-destructive/10 text-destructive p-3 text-sm">{loadError}</div>
+        ) : null}
         <div className="grid gap-3">
           {projects.map((p) => (
-            <Card key={p.id}>
+            <Card key={p.id} className="transition-shadow hover:shadow-sm">
               <CardHeader>
                 <CardTitle>{p.title}</CardTitle>
                 <CardDescription>{p.projectType}</CardDescription>
@@ -96,7 +109,17 @@ export default function ProjectsPage() {
               </CardContent>
             </Card>
           ))}
-          {!projects.length ? <p className="text-sm text-muted-foreground">No projects yet.</p> : null}
+          {!projects.length && !isLoading ? (
+            <EmptyState
+              title="No projects yet"
+              description="Create a new project to find collaborators, or adjust your filters."
+              action={(
+                <Button asChild size="sm">
+                  <Link href="/projects/new">Create Project</Link>
+                </Button>
+              )}
+            />
+          ) : null}
         </div>
         <div className="flex items-center justify-between pt-2">
           <Button variant="outline" disabled={page <= 1} onClick={() => { setPage((p) => Math.max(1, p - 1)); }}>
