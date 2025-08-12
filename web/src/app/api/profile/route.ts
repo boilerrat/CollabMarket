@@ -13,7 +13,14 @@ export async function POST(req: NextRequest) {
   const userId = await getOrCreateUserId();
   if (!userId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
 
-  let data: any;
+  let data: {
+    display_name?: string;
+    handle?: string;
+    bio?: string;
+    skills?: string[] | string;
+    project_types?: string[] | string;
+    availability_hours_week?: number | string;
+  };
   try {
     data = await req.json();
   } catch {
@@ -24,13 +31,13 @@ export async function POST(req: NextRequest) {
   const handle = String(data?.handle || "").trim();
   const bio = String(data?.bio || "");
   const skills: string[] = Array.isArray(data?.skills)
-    ? data.skills.map((s: any) => String(s).trim()).filter(Boolean)
+    ? data.skills.map((s) => String(s).trim()).filter(Boolean)
     : String(data?.skills || "")
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
   const project_types: string[] = Array.isArray(data?.project_types)
-    ? data.project_types.map((s: any) => String(s).trim()).filter(Boolean)
+    ? data.project_types.map((s) => String(s).trim()).filter(Boolean)
     : String(data?.project_types || "")
         .split(",")
         .map((s) => s.trim())
@@ -64,8 +71,9 @@ export async function POST(req: NextRequest) {
           },
         });
     return Response.json({ ok: true, profile });
-  } catch (err: any) {
-    return Response.json({ ok: false, error: err?.message || "failed" }, { status: 500 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "failed";
+    return Response.json({ ok: false, error: message }, { status: 500 });
   }
 }
 

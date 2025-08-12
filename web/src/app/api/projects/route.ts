@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, Number(searchParams.get("page") || 1));
   const per = Math.min(50, Math.max(1, Number(searchParams.get("per") || 10)));
 
-  const where: any = {};
+  const where: Record<string, unknown> = {};
   if (!showArchived) where.archived = false;
   if (projectType) where.projectType = projectType;
   if (skills.length) where.skills = { hasEvery: skills };
@@ -36,10 +36,12 @@ export async function GET(req: NextRequest) {
   return Response.json({ ok: true, projects: list, page, per, hasMore: list.length === per });
 }
 
+type NewProjectBody = { title?: string; pitch?: string; project_type?: string; skills?: string[] };
+
 export async function POST(req: NextRequest) {
   const ownerId = await getOrCreateUserId();
   if (!ownerId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
-  let data: Partial<Project>;
+  let data: NewProjectBody;
   try {
     data = await req.json();
   } catch {

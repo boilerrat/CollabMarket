@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, Number(searchParams.get("page") || 1));
   const per = Math.min(50, Math.max(1, Number(searchParams.get("per") || 10)));
 
-  const where: any = {};
+  const where: Record<string, unknown> = {};
   if (projectType) where.projectTypes = { has: projectType };
   if (skills.length) where.skills = { hasEvery: skills };
   if (q) {

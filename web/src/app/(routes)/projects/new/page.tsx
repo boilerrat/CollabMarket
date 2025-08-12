@@ -47,9 +47,10 @@ export default function NewProjectPage() {
       setSkillsList([]);
       toast.success("Project created");
       router.push("/projects");
-    } catch (err: any) {
-      setMessage(err?.message || "Failed to create");
-      toast.error(err?.message || "Failed to create");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to create";
+      setMessage(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }

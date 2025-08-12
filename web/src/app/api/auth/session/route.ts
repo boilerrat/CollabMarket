@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { createHmac } from "crypto";
+import { prisma } from "@/server/db";
+import { verifyQuickAuthToken } from "@/server/auth";
 
 // Temporary: store token in an httpOnly cookie for demo purposes.
 // Replace with server-side verification and a signed session cookie.
@@ -12,7 +14,19 @@ export async function POST(req: NextRequest) {
     if (!token) {
       return Response.json({ ok: false, error: "missing token" }, { status: 400 });
     }
-    // TODO: verify token server-side per docs and derive user identity from verified claims.
+    // Verify token server-side and upsert user with derived identity.
+    const claims = await verifyQuickAuthToken(token);
+    if (!claims) {
+      return Response.json({ ok: false, error: "invalid token" }, { status: 401 });
+    }
+    if (claims.fid) {
+      const userId = `usr_fid_${claims.fid}`;
+      await prisma.user.upsert({
+        where: { id: userId },
+        update: { fid: claims.fid, handle: claims.username || undefined, displayName: claims.displayName || undefined, avatarUrl: claims.pfpUrl || undefined },
+        create: { id: userId, fid: claims.fid, handle: claims.username || undefined, displayName: claims.displayName || undefined, avatarUrl: claims.pfpUrl || undefined },
+      });
+    }
     const secret = process.env.SESSION_SECRET || "dev-secret-not-for-prod";
     const sig = createHmac("sha256", secret).update(token).digest("hex");
     const value = `${token}.${sig}`;

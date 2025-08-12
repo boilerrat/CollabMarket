@@ -2,10 +2,10 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const userId = await getOrCreateUserId();
   if (!userId) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
-  const id = params.id;
+  const { id } = await context.params;
   let body: { status?: "accepted" | "dismissed" } = {};
   try {
     body = await req.json();

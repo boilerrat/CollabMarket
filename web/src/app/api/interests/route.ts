@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { getUserKey } from "@/app/api/utils/session";
 import { prisma } from "@/server/db";
 import { getOrCreateUserId } from "@/server/auth";
 
@@ -17,7 +16,8 @@ export async function POST(req: NextRequest) {
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) return Response.json({ ok: false, error: "project not found" }, { status: 404 });
   const profile = await prisma.collaboratorProfile.findFirst({ where: { userId: fromUserId } });
-  const hasMatch = !!profile && project.skills.some((s) => (profile.skills || []).map((x) => x.toLowerCase()).includes(s.toLowerCase()));
+  const profileSkills = (profile?.skills || []).map((x) => x.toLowerCase());
+  const hasMatch = project.skills.some((s) => profileSkills.includes(s.toLowerCase()));
   const interest = await prisma.interest.create({ data: { projectId, fromUserId, message: body?.message, skillMatch: hasMatch } });
   return Response.json({ ok: true, interest });
 }

@@ -13,6 +13,7 @@ type ProfileForm = {
   display_name: string;
   handle: string;
   bio: string;
+  avatar_url?: string;
   skills: string;
   availability_hours_week: number | "";
 };
@@ -22,6 +23,7 @@ export default function ProfilePage() {
     display_name: "",
     handle: "",
     bio: "",
+    avatar_url: "",
     skills: "",
     availability_hours_week: "",
   });
@@ -31,7 +33,10 @@ export default function ProfilePage() {
   useEffect(() => {
     const fillFromFarcaster = async () => {
       try {
-        const context: any = (sdk as any).context?.get?.();
+        type SdkUser = { displayName?: string; username?: string; bio?: string; pfpUrl?: string };
+        type SdkContext = { user?: SdkUser };
+        const ctxGetter = (sdk as unknown as { context?: { get?: () => SdkContext } }).context?.get;
+        const context = typeof ctxGetter === "function" ? ctxGetter() : undefined;
         const user = context?.user;
         if (!user) return;
         setForm((prev) => ({
@@ -39,6 +44,7 @@ export default function ProfilePage() {
           display_name: user.displayName || prev.display_name,
           handle: user.username || prev.handle,
           bio: user.bio || prev.bio,
+          avatar_url: user.pfpUrl || prev.avatar_url,
         }));
       } catch {
         // ignore if SDK context not available
@@ -67,8 +73,9 @@ export default function ProfilePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to save");
       setMessage("Saved");
-    } catch (err: any) {
-      setMessage(err?.message || "Failed to save");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save";
+      setMessage(message);
     } finally {
       setSaving(false);
     }

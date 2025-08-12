@@ -16,11 +16,11 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   const existing = await prisma.project.findUnique({ where: { id } });
   if (!existing) return Response.json({ ok: false, error: "not found" }, { status: 404 });
   if (existing.ownerId !== ownerId) return Response.json({ ok: false, error: "forbidden" }, { status: 403 });
-  let body: any = {};
+  let body: Partial<{ title: string; pitch: string; skills: string[]; projectType: string; status: string; archived: boolean }> = {};
   try {
     body = await req.json();
   } catch {}
-  const data: any = {};
+  const data: Record<string, unknown> = {};
   if (typeof body.title === "string") data.title = body.title;
   if (typeof body.pitch === "string") data.pitch = body.pitch;
   if (Array.isArray(body.skills)) data.skills = body.skills;

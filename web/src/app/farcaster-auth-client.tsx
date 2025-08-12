@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 
-type AuthStatus = {
-  isAuthenticated: boolean;
-  token?: string;
-};
+// Removed unused AuthStatus type
 
 async function persistSession(token: string): Promise<void> {
   await fetch("/api/auth/session", {
@@ -30,7 +27,7 @@ export function FarcasterAuthClient(): null {
         }
         // Attempt Quick Auth automatically; method name may vary by SDK version
         // Use defensive access to avoid hard type coupling
-        const quickAuth: any = (sdk as any).quickAuth;
+        const quickAuth = (sdk as unknown as { quickAuth?: { getToken?: () => Promise<string>; signIn?: () => Promise<{ token?: string; jwt?: string }>; fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> } }).quickAuth;
         let token: string | undefined;
         if (quickAuth?.getToken) {
           token = await quickAuth.getToken().catch(() => undefined);
@@ -41,6 +38,16 @@ export function FarcasterAuthClient(): null {
 
         if (token && isMounted) {
           await persistSession(token);
+        } else if (quickAuth?.fetch) {
+          // Fallback: ask Quick Auth to fetch our endpoint with bearer token and set cookie
+          try {
+            const res = await quickAuth.fetch("/api/auth/quick", { method: "GET" });
+            if (!res.ok) {
+              // ignore
+            }
+          } catch {
+            // ignore
+          }
         }
       } catch {
         // ignore errors (e.g., not in FC client)

@@ -125,11 +125,9 @@ export default function Home() {
           </TabsList>
           <TabsContent value="projects">
             {/* Server-rendered preview of latest projects */}
-            {/* @ts-expect-error Async Server Component */}
             <ProjectsPreview />
           </TabsContent>
           <TabsContent value="collaborators">
-            {/* @ts-expect-error Async Server Component */}
             <CollaboratorsPreview />
           </TabsContent>
           <TabsContent value="post">
