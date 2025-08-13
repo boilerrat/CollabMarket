@@ -4,6 +4,7 @@ import "./globals.css";
 import { MiniAppReady } from "./ready-client";
 import { FarcasterAuthClient } from "./farcaster-auth-client";
 import { Toaster } from "@/components/ui/sonner";
+import { SiteHeader } from "@/components/ui/site-header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <MiniAppReady />
         <FarcasterAuthClient />
+        <SiteHeader />
         {children}
         <Toaster richColors position="top-center" />
       </body>

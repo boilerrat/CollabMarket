@@ -115,7 +115,25 @@ async function CollaboratorsPreview() {
 export default function Home() {
   return (
     <main className="min-h-dvh p-4">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-5xl">
+        <section className="relative overflow-hidden rounded-xl border p-6 md:p-10 bg-gradient-to-br from-secondary/50 via-background to-secondary/30">
+          <div className="relative z-10 max-w-2xl">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Find collaborators. Ship faster.</h1>
+            <p className="mt-2 text-sm md:text-base text-muted-foreground">
+              Post projects, discover builders, and turn ideas into reality with the Farcaster community.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button asChild>
+                <Link href="/projects/new">Post a Project</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/collaborators">Browse Collaborators</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="absolute -right-16 -top-16 size-72 md:size-[22rem] rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -left-24 -bottom-24 size-80 md:size-[26rem] rounded-full bg-chart-2/10 blur-3xl" />
+        </section>
         <Tabs defaultValue="projects">
           <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="projects">Projects</TabsTrigger>

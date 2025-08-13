@@ -122,5 +122,27 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(1200px 500px at 50% -10%, color-mix(in oklch, var(--primary) 20%, transparent) 0, transparent 50%),
+      radial-gradient(900px 400px at 110% 10%, color-mix(in oklch, var(--chart-2) 16%, transparent) 0, transparent 50%),
+      radial-gradient(900px 400px at -10% 20%, color-mix(in oklch, var(--chart-3) 12%, transparent) 0, transparent 50%);
+    background-repeat: no-repeat;
   }
+}
+
+@keyframes aurora {
+  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: .8; }
+  50% { transform: translateY(-10px) rotate(10deg) scale(1.05); opacity: .9; }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: .8; }
+}
+
+.animate-aurora {
+  animation: aurora 14s ease-in-out infinite;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--primary), var(--chart-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
