@@ -9,6 +9,7 @@ import Link from "next/link";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { withStagger } from "@/lib/utils";
 
 type Profile = {
   userKey: string;
@@ -80,8 +81,8 @@ export default function CollaboratorsPage() {
           <div className="rounded-md border bg-destructive/10 text-destructive p-3 text-sm">{loadError}</div>
         ) : null}
         <div className="grid gap-3">
-          {profiles.map((p) => (
-            <Card key={p.userKey} className="transition-shadow hover:shadow-sm">
+          {profiles.map((p, i) => (
+            <Card key={p.userKey} className="transition-shadow hover:shadow-sm animate-in-up" {...withStagger(i)}>
               <CardHeader>
                 <CardTitle>{p.display_name}</CardTitle>
                 <CardDescription>@{p.handle}</CardDescription>

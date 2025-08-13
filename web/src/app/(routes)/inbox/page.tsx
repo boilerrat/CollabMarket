@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/page-header";
+import { withStagger } from "@/lib/utils";
 
 type InboxItem = {
   id: string;
@@ -54,8 +55,8 @@ export default function InboxPage() {
               <div className="rounded-md border bg-destructive/10 text-destructive p-3 text-sm mb-3">{loadError}</div>
             ) : null}
             <div className="grid gap-3">
-              {inbox.map((i) => (
-                <div key={i.id} className="flex items-center justify-between border rounded-md p-3 transition-colors hover:bg-accent/40">
+              {inbox.map((i, idx) => (
+                <div key={i.id} className="flex items-center justify-between border rounded-md p-3 transition-colors hover:bg-accent/40 animate-in-up" {...withStagger(idx)}>
                   <div className="text-sm">
                     <div className="font-medium">Interest</div>
                     <div className="text-muted-foreground">Project: {i.projectId}</div>

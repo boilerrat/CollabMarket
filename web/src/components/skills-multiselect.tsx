@@ -26,13 +26,13 @@ export function SkillsMultiSelect({ selected, onChange, options = [], placeholde
   return (
     <div className="flex flex-wrap items-center gap-2">
       {selected.map((s) => (
-        <Badge key={s} variant="secondary" className="cursor-pointer" onClick={() => toggle(s)}>
+        <Badge key={s} variant="secondary" className="cursor-pointer hover:scale-[.98] transition-transform" onClick={() => toggle(s)}>
           {s}
         </Badge>
       ))}
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm">{placeholder}</Button>
+          <Button variant="outline" size="sm" className="hover:border-primary/40 hover:bg-accent/30">{placeholder}</Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-64" align="start">
           <Command>

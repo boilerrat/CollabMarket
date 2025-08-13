@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { SkillsMultiSelect } from "@/components/skills-multiselect";
 import { EmptyState } from "@/components/ui/empty-state";
+import { withStagger } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 
 type Project = {
@@ -77,8 +78,8 @@ export default function ProjectsPage() {
           <div className="rounded-md border bg-destructive/10 text-destructive p-3 text-sm">{loadError}</div>
         ) : null}
         <div className="grid gap-3">
-          {projects.map((p) => (
-            <Card key={p.id} className="transition-shadow hover:shadow-sm">
+          {projects.map((p, i) => (
+            <Card key={p.id} className="transition-shadow hover:shadow-sm animate-in-up" {...withStagger(i)}>
               <CardHeader>
                 <CardTitle>{p.title}</CardTitle>
                 <CardDescription>{p.projectType}</CardDescription>

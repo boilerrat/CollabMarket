@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { prisma } from "@/server/db";
 import { Badge } from "@/components/ui/badge";
+import { AuroraBackground } from "@/components/ui/aurora";
 
 async function ProjectsPreview() {
   const projects = await prisma.project.findMany({ orderBy: { createdAt: "desc" }, take: 5 });
@@ -115,7 +116,8 @@ async function CollaboratorsPreview() {
 export default function Home() {
   return (
     <main className="min-h-dvh p-4">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-5xl relative">
+        <AuroraBackground />
         <section className="relative overflow-hidden rounded-xl border p-6 md:p-10 bg-gradient-to-br from-secondary/50 via-background to-secondary/30">
           <div className="relative z-10 max-w-2xl">
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Find collaborators. Ship faster.</h1>
